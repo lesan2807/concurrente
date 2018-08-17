@@ -98,6 +98,7 @@ long long MainWindow::calculateEvenGoldbach(long long number)
         // If user cancelled, stop calculations
         if ( this->isStopped() )
             return results;
+        QApplication::processEvents();
     }
     return results;
 }
@@ -120,6 +121,7 @@ long long MainWindow::calculateOddGoldbach(long long number)
             // If user cancelled, stop calculations
             if ( this->isStopped() )
                 return results;
+            QApplication::processEvents();
         }
     }
     return results;
