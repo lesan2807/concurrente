@@ -1,0 +1,6 @@
+*.user*
+build-*
+*.o
+*.exe
+*.dSYM
+*.autosave
