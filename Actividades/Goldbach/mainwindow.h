@@ -2,8 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTime>
 
 class QProgressBar;
+class GoldbachWorker;
 
 namespace Ui {
 class MainWindow;
@@ -18,6 +20,8 @@ class MainWindow : public QMainWindow
     Ui::MainWindow *ui;
     QProgressBar* progressBar = nullptr;
     bool stopped = true;
+    GoldbachWorker* goldbachWorker = nullptr;
+    QTime time;
 
   public:
     explicit MainWindow(QWidget *parent = 0);
@@ -27,56 +31,23 @@ class MainWindow : public QMainWindow
      * @param number The number given by user
      */
     void startCalculation(long long number);
-    void appendResult(const QString& result);
     void updateProgressBar(int percent);
     inline bool isStopped() const
     {
         return this->stopped;
     }
 
-  private slots:
+  private slots: // manejador de eventos
     void on_lineEditNumber_textEdited(const QString &arg1);
     void on_pushButtonStart_clicked();
-
     void on_pushButtonStop_clicked();
 
-protected:
-    /**
-     * @brief Calcula las sumas de Goldbach para el numero dado y las agrega a una pizarra
-     * @param number El numero dado por el usuario
-     * @return La cantidad de sumas encontradas
-     */
-    long long calculate(long long number);
-    /**
-     * Calcula todas las sumas de dos primos que equivalen al numero dado, y las presenta
-     * en el area resultado. Incrementa la barra de progreso mientras realiza el calculo
-     * de la conjetura fuerte de Goldbach, por ejemplo:
-     *
-     *   4 == 2 + 2
-     *   6 == 3 + 3
-     *  10 == 3 + 7 == 5 + 5
-     *
-     * @param numero Un numero entero par mayor o igual a 4
-     * @return la cantidad de sumas de dos primos encontradas
-     */
-    long long calculateEvenGoldbach(long long number);
-    /**
-     * Calcula todas las sumas de tres primos que equivalen al numero dado, y las presenta
-     * en el area resultado. Incrementa la barra de progreso mientras realiza el calculo
-     * de la conjetura debil de Goldbach, por ejemplo:
-     *
-     *   7 == 2 + 2 + 3
-     *   9 == 2 + 2 + 5 == 3 + 3 + 3
-     *
-     * @param numero Un numero entero impar mayor o igual a 7
-     * @return la cantidad de sumas de tres primos encontradas
-     */
-    long long calculateOddGoldbach(long long number);
-    /**
-     * Retorna true si numero es primo, false si numero no es primo o menor que 2
-     * Por definicion 1 no es primo ni compuesto, este metodo retorna false
-     */
-    static bool isPrime(long long numero);
+
+  protected slots:
+    void workerFinished();
+    void appendResult(const QString& result);
+
+
 };
 
 #endif // MAINWINDOW_H

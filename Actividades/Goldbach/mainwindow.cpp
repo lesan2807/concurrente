@@ -1,6 +1,8 @@
 #include <QtMath>
 #include <QProgressBar>
+#include <QTime>
 
+#include "goldbachworker.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -43,7 +45,12 @@ void MainWindow::on_lineEditNumber_textEdited(const QString &arg1)
 void MainWindow::on_pushButtonStop_clicked()
 {
     this->stopped = true;
+    Q_ASSERT( this->goldbachWorker ); // checkear que tenga un thread, programación defensiva
+
+    this->goldbachWorker->requestInterruption();
 }
+
+
 
 void MainWindow::on_pushButtonStart_clicked()
 {
@@ -68,72 +75,27 @@ void MainWindow::startCalculation(long long number)
     this->ui->plainTextEditResults->clear();
     this->ui->statusBar->showMessage(tr("Calculating..."));
 
-    this->stopped = false;
-    this->calculate(number);
-    this->stopped = true;
 
+    this->time.start();
+
+    this->stopped = false;
+    this->goldbachWorker = new GoldbachWorker(number, this);
+    this->connect(this->goldbachWorker, &GoldbachWorker::sumFound, this, &MainWindow::appendResult);
+    this->connect( this->goldbachWorker, &GoldbachWorker::finished, this, &MainWindow::workerFinished );
+
+    this->goldbachWorker->start(); // division de trabajo
+}
+
+void MainWindow::workerFinished()
+{
+
+    long long sumCount = 0; // = this->calculate(number);
+    this->stopped = true;
+    double seconds = this->time.elapsed() / 1000.0;
     this->ui->pushButtonStart->setEnabled(true);
     this->ui->pushButtonStop->setEnabled(false);
-    this->ui->statusBar->showMessage(tr("Ready"));
+    this->ui->statusBar->showMessage(tr("%1 sums found in %2 seconds").arg(sumCount).arg(seconds));
+
+    this->goldbachWorker->deleteLater(); // evitar eliminar el obj antes de que se ejec los eventos
 }
 
-long long MainWindow::calculate(long long number)
-{
-    if ( number < 4 || number == 5 ) return 0;
-    return number % 2 == 0 ? calculateEvenGoldbach(number) : calculateOddGoldbach(number);
-}
-
-long long MainWindow::calculateEvenGoldbach(long long number)
-{
-    long long results = 0;
-    for ( long long a = 2; a < number; ++a )
-    {
-        if ( ! isPrime(a) ) continue;
-        long long b = number - a;
-        if ( b >= a && isPrime(b) )
-            this->appendResult( tr("%1: %2 + %3").arg(++results).arg(a).arg(b) );
-
-        // Update the progress bar
-        this->updateProgressBar((a + 1) * 100 / number);
-        // If user cancelled, stop calculations
-        if ( this->isStopped() )
-            return results;
-        QApplication::processEvents();
-    }
-    return results;
-}
-
-long long MainWindow::calculateOddGoldbach(long long number)
-{
-    long long results = 0;
-    for ( long long a = 2; a < number; ++a )
-    {
-        if ( ! isPrime(a) ) continue;
-        for ( long long b = a; b < number; ++b )
-        {
-            if ( ! isPrime(b) ) continue;
-            long long c = number - a - b;
-            if ( c >= b && isPrime(c) )
-                this->appendResult( tr("%1: %2 + %3 + %4").arg(++results).arg(a).arg(b).arg(c) );
-
-            // Update the progress bar
-            this->updateProgressBar((a + 1) * 100 / number);
-            // If user cancelled, stop calculations
-            if ( this->isStopped() )
-                return results;
-            QApplication::processEvents();
-        }
-    }
-    return results;
-}
-
-bool MainWindow::isPrime(long long number)
-{
-    if ( number < 2 ) return false;
-
-    for ( long long i = 2, last = qSqrt(number); i <= last; ++i )
-        if ( number % i == 0 )
-            return false;
-
-    return true;
-}
