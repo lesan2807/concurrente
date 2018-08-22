@@ -79,7 +79,7 @@ void MainWindow::startCalculation(long long number)
     this->time.start();
 
     this->stopped = false;
-    this->goldbachWorker = new GoldbachWorker(number, this);
+    this->goldbachWorker = new GoldbachWorker(number, 0, 0, this);
     this->connect(this->goldbachWorker, &GoldbachWorker::sumFound, this, &MainWindow::appendResult);
     this->connect( this->goldbachWorker, &GoldbachWorker::finished, this, &MainWindow::workerFinished );
 

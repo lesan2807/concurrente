@@ -26,11 +26,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    goldbachworker.cpp
+    goldbachworker.cpp \
+    goldbachworkermanager.cpp
 
 HEADERS += \
         mainwindow.h \
-    goldbachworker.h
+    goldbachworker.h \
+    goldbachworkermanager.h
 
 FORMS += \
         mainwindow.ui

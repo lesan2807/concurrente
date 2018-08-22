@@ -1,7 +1,7 @@
 #include "goldbachworker.h"
 #include <QtMath>
 
-GoldbachWorker::GoldbachWorker(long long number, QObject *parent)
+GoldbachWorker::GoldbachWorker(long long number, int workerNumber ,int workerCount, QObject *parent)
     : QThread(parent)
     , number(number)
 {
@@ -22,11 +22,11 @@ long long GoldbachWorker::calculate(long long number)
 long long GoldbachWorker::calculateEvenGoldbach(long long number)
 {
     long long results = 0;
-    for ( long long a = 2; a < number; ++a )
+    for ( long long a = 2; a < number/2; ++a )
     {
         if ( ! isPrime(a) ) continue;
         long long b = number - a;
-        if ( b >= a && isPrime(b) )
+        if ( isPrime(b) )
             emit sumFound( tr("%1: %2 + %3").arg(++results).arg(a).arg(b) );
 
 //        // Update the progress bar
@@ -44,11 +44,11 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
     for ( long long a = 2; a < number; ++a )
     {
         if ( ! isPrime(a) ) continue;
-        for ( long long b = a; b < number; ++b )
+        for ( long long b = a; b < number/2; ++b )
         {
             if ( ! isPrime(b) ) continue;
             long long c = number - a - b;
-            if ( c >= b && isPrime(c) )
+            if (  isPrime(c) )
                 emit sumFound( tr("%1: %2 + %3 + %4").arg(++results).arg(a).arg(b).arg(c) );
 
 //            // Update the progress bar

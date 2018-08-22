@@ -12,7 +12,7 @@ class GoldbachWorker : public QThread
   protected:
     long long number;
   public:
-    explicit GoldbachWorker(long long number, int workerNumber ,int workerCount, QObject *parent = nullptr);
+    explicit GoldbachWorker(long long number, int workerNumber = 0 ,int workerCount = 0, QObject *parent = nullptr);
 
   protected:
     void run() override;
