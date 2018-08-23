@@ -1,12 +1,30 @@
 #ifndef GOLDBACHWORKERMANAGER_H
 #define GOLDBACHWORKERMANAGER_H
 
-#include <QObject>
+#include "goldbachworker.h"
 
-class GoldbachWorkerManager
+#include <QVector>
+#include <QThread>
+
+class GoldbachWorkerManager : QThread
 {
-public:
-    GoldbachWorkerManager();
+    Q_OBJECT
+
+  private:
+    QVector<GoldbachWorker*> goldbachWorkers;
+
+  public:
+    GoldbachWorkerManager(long long number);
+    ~GoldbachWorkerManager();
+
+
+  protected:
+
+
+  signals:
+    void sendSum();
+  protected slots:
+
 };
 
 #endif // GOLDBACHWORKERMANAGER_H

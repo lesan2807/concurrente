@@ -11,6 +11,9 @@ class GoldbachWorker : public QThread
 
   protected:
     long long number;
+    int workerNumber;
+    int workerCount;
+
   public:
     explicit GoldbachWorker(long long number, int workerNumber = 0 ,int workerCount = 0, QObject *parent = nullptr);
 

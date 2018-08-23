@@ -1,9 +1,11 @@
 #include "goldbachworker.h"
 #include <QtMath>
 
-GoldbachWorker::GoldbachWorker(long long number, int workerNumber ,int workerCount, QObject *parent)
+GoldbachWorker::GoldbachWorker(long long number, int workerNumber,int workerCount, QObject *parent)
     : QThread(parent)
     , number(number)
+    , workerNumber{workerNumber}
+    , workerCount{workerCount}
 {
 
 }
@@ -31,7 +33,7 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
 
 //        // Update the progress bar
 //        this->updateProgressBar((a + 1) * 100 / number);
-//        // If user cancelled, stop calculations
+        // If user cancelled, stop calculations
         if ( this->isInterruptionRequested() )
             return results;
     }
@@ -53,7 +55,7 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
 
 //            // Update the progress bar
 //            this->updateProgressBar((a + 1) * 100 / number);
-//            // If user cancelled, stop calculations
+            // If user cancelled, stop calculations
             if ( this->isInterruptionRequested() )
                 return results;
         }
