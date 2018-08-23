@@ -10,12 +10,12 @@ class GoldbachWorkerManager : QThread
 {
     Q_OBJECT
 
-  private:
+  protected:
     QVector<GoldbachWorker*> goldbachWorkers;
 
   public:
-    GoldbachWorkerManager(long long number);
-    ~GoldbachWorkerManager();
+    explicit GoldbachWorkerManager(long long number);
+    virtual ~GoldbachWorkerManager();
 
 
   protected:

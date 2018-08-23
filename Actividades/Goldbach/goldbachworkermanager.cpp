@@ -19,3 +19,4 @@ GoldbachWorkerManager::~GoldbachWorkerManager()
     }
 
 }
+
