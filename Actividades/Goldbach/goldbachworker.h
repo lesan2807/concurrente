@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include <QThread>
+#include <QVector>
 #include <QTime>
 
 class GoldbachWorker : public QThread
@@ -15,15 +16,15 @@ class GoldbachWorker : public QThread
     int workerCurrent;
     int workerIdeal;
     QTime time;
+    QVector<QString>& results;
 
   public:
-    explicit GoldbachWorker(long long number, int current = 0 , int ideal = 0, QObject *parent = nullptr);
+    explicit GoldbachWorker(long long number, int current, int ideal, QVector<QString>& results, QObject *parent = nullptr);
 
   protected:
     void run() override;
 
   signals: // eventos que genera el worker
-    void sumFound(const QString& sum);
     void percent(int percent);
     void calculationDone(long long sumCount);
 

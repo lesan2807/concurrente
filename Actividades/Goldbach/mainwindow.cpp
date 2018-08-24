@@ -25,11 +25,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::appendResult(const QString &result)
-{
-    // this->ui->plainTextEditResults->appendPlainText( result );
-}
-
 void MainWindow::updateProgressBar(int percent)
 {
     this->progressBar->setValue(percent);

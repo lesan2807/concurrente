@@ -2,11 +2,12 @@
 #include <QtMath>
 #include <iostream>
 
-GoldbachWorker::GoldbachWorker(long long number, int current,int ideal, QObject *parent)
+GoldbachWorker::GoldbachWorker(long long number, int current,int ideal, QVector<QString>& results, QObject *parent)
     : QThread(parent)
     , number(number)
     , workerCurrent{current}
     , workerIdeal{ideal}
+    , results{results}
 
 {
 
@@ -33,7 +34,7 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
         if ( ! isPrime(a) ) continue;
         long long b = number - a;
         if ( b >= a && isPrime(b) )
-            emit sumFound( tr("%1: %2 + %3").arg(++results).arg(a).arg(b) );
+            this->results.append( tr("%1: %2 + %3").arg(++results).arg(a).arg(b) );
 
 //        // Update the progress bar
 //        this->updateProgressBar((a + 1) * 100 / number);
@@ -55,7 +56,7 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
             if ( ! isPrime(b) ) continue;
             long long c = number - a - b;
             if ( c >= b && isPrime(c) )
-                emit sumFound( tr("%1: %2 + %3 + %4").arg(++results).arg(a).arg(b).arg(c) );
+                this->results.append(tr("%1: %2 + %3 + %4").arg(++results).arg(a).arg(b).arg(c) );
 
 //            // Update the progress bar
 //            this->updateProgressBar((a + 1) * 100 / number);

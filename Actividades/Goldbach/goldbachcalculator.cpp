@@ -10,7 +10,7 @@ GoldbachCalculator::GoldbachCalculator(QObject *parent)
 void GoldbachCalculator::calculate(long long number)
 {
     this->beginResetModel();
-    this->goldbachWorker = new GoldbachWorker(number, 0, 0, this);
+    this->goldbachWorker = new GoldbachWorker(number, 0, 0, this->results, this);
     this->connect(goldbachWorker, &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone); //terminó el trabajador
     this->goldbachWorker->start();
 
@@ -66,6 +66,29 @@ QVariant GoldbachCalculator::data(const QModelIndex &index, int role) const
    }
 
    return QVariant();
+}
+
+bool GoldbachCalculator::canFetchMore(const QModelIndex &parent) const
+{
+    Q_UNUSED(parent);
+    return this->lastRowFetched < this->results.count();
+}
+
+void GoldbachCalculator::fetchMore(const QModelIndex &parent)
+{
+    Q_UNUSED(parent);
+    int remainder = this->results.size() - this->lastRowFetched;
+    int itemsToFetch = qMin(100, remainder);
+
+    if (itemsToFetch <= 0)
+        return;
+
+    int firstRow = this->lastRowFetched;
+    int lastRow  = this->lastRowFetched + itemsToFetch-1;
+    beginInsertRows(QModelIndex(), firstRow, lastRow);
+    this->lastRowFetched += itemsToFetch;
+    endInsertRows();
+
 }
 
 void GoldbachCalculator::workerDone(long long sumCount)

@@ -25,6 +25,10 @@ class GoldbachCalculator : public QAbstractListModel
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
+  protected:
+    bool canFetchMore(const QModelIndex &parent) const override;
+    void fetchMore(const QModelIndex &parent) override;
+
   signals:
     void calculationDone(long long sumCount); //avisa que ha terminado los calculos
 

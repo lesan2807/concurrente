@@ -39,7 +39,6 @@ class MainWindow : public QMainWindow
 
   protected slots:
     void calculationDone(long long sumCount);
-    void appendResult(const QString& result);
 
 };
 
