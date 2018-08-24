@@ -31,7 +31,7 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
     {
         if ( ! isPrime(a) ) continue;
         long long b = number - a;
-        if ( isPrime(b) )
+        if ( b >= a && isPrime(b) )
             emit sumFound( tr("%1: %2 + %3").arg(++results).arg(a).arg(b) );
 
 //        // Update the progress bar
@@ -53,7 +53,7 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
         {
             if ( ! isPrime(b) ) continue;
             long long c = number - a - b;
-            if (  isPrime(c) )
+            if ( c >= b && isPrime(c) )
                 emit sumFound( tr("%1: %2 + %3 + %4").arg(++results).arg(a).arg(b).arg(c) );
 
 //            // Update the progress bar
@@ -88,7 +88,7 @@ long long GoldbachWorker::initialRange()
 long long GoldbachWorker::finalRange()
 {
     if (this->workerCurrent == this->workerIdeal-1)
-        return this->number/2;
+        return this->number;
     long long initialRange = 0;
     long long division = (this->number-2)/this->workerIdeal;
     initialRange = 2 + ((this->workerCurrent+1)*division);
