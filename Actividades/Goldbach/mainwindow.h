@@ -5,7 +5,7 @@
 #include <QTime>
 
 class QProgressBar;
-class GoldbachWorker;
+class GoldbachCalculator;
 
 namespace Ui {
 class MainWindow;
@@ -19,8 +19,7 @@ class MainWindow : public QMainWindow
   protected:
     Ui::MainWindow *ui;
     QProgressBar* progressBar = nullptr;
-    bool stopped = true;
-    GoldbachWorker* goldbachWorker = nullptr;
+    GoldbachCalculator* goldbachCalculator = nullptr;
     QTime time;
 
   public:
@@ -32,21 +31,15 @@ class MainWindow : public QMainWindow
      */
     void startCalculation(long long number);
     void updateProgressBar(int percent);
-    inline bool isStopped() const
-    {
-        return this->stopped;
-    }
 
   private slots: // manejador de eventos
     void on_lineEditNumber_textEdited(const QString &arg1);
     void on_pushButtonStart_clicked();
     void on_pushButtonStop_clicked();
 
-
   protected slots:
-    void workerFinished();
+    void calculationDone(long long sumCount);
     void appendResult(const QString& result);
-
 
 };
 

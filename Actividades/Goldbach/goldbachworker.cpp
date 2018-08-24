@@ -14,7 +14,8 @@ GoldbachWorker::GoldbachWorker(long long number, int current,int ideal, QObject 
 
 void GoldbachWorker::run()
 {
-    this->calculate(this->number);
+    long long sumCount = this->calculate(this->number);
+    emit this->calculationDone(sumCount);
 }
 
 long long GoldbachWorker::calculate(long long number)
@@ -82,15 +83,15 @@ long long GoldbachWorker::initialRange()
     long long initialRange = 0;
     long long division = (this->number-2)/this->workerIdeal;
     initialRange = 2 + (this->workerCurrent*division);
-    return 0;
+    return initialRange;
 }
 
 long long GoldbachWorker::finalRange()
 {
     if (this->workerCurrent == this->workerIdeal-1)
         return this->number;
-    long long initialRange = 0;
+    long long finalRange = 0;
     long long division = (this->number-2)/this->workerIdeal;
-    initialRange = 2 + ((this->workerCurrent+1)*division);
-    return 0;
+    finalRange = 2 + ((this->workerCurrent+1)*division);
+    return finalRange;
 }

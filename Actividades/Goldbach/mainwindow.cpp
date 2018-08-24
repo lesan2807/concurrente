@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "goldbachworker.h"
+#include "goldbachcalculator.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -26,7 +27,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::appendResult(const QString &result)
 {
-    this->ui->plainTextEditResults->appendPlainText( result );
+    // this->ui->plainTextEditResults->appendPlainText( result );
 }
 
 void MainWindow::updateProgressBar(int percent)
@@ -42,16 +43,12 @@ void MainWindow::on_lineEditNumber_textEdited(const QString &arg1)
     this->ui->pushButtonStart->setEnabled( enable );
 }
 
-
 void MainWindow::on_pushButtonStop_clicked()
 {
-    this->stopped = true;
-    Q_ASSERT( this->goldbachWorker ); // checkear que tenga un thread, programación defensiva
 
-    this->goldbachWorker->requestInterruption();
+    Q_ASSERT( this->goldbachCalculator ); // checkear que tenga un thread, programación defensiva
+    this->goldbachCalculator->stop();
 }
-
-
 
 void MainWindow::on_pushButtonStart_clicked()
 {
@@ -73,46 +70,21 @@ void MainWindow::startCalculation(long long number)
 {
     this->ui->pushButtonStart->setEnabled(false);
     this->ui->pushButtonStop->setEnabled(true);
-    this->ui->plainTextEditResults->clear();
+
+    this->goldbachCalculator = new GoldbachCalculator(this);
+    this->ui->listViewResults->setModel( goldbachCalculator );
+    this->connect(this->goldbachCalculator, &GoldbachCalculator::calculationDone, this, &MainWindow::calculationDone);
     this->ui->statusBar->showMessage(tr("Calculating..."));
-
-
     this->time.start();
-    this->stopped = false;
-
-    QVector<GoldbachWorker*> workers;
-
-    int ideal = QThread::idealThreadCount() - 1;
-    for ( int current = 0; current < ideal; ++current  )
-    {
-        GoldbachWorker* worker = new GoldbachWorker(number, current, ideal, this);
-        // Hacer las conexiones para reaccionar cuando el worker:
-        // (1) encuentra una suma, (2) incrementa el porcentaje, (3) termina
-        this->connect(worker, &GoldbachWorker::sumFound, this, &MainWindow::appendResult);
-        //this->connect(worker, &GoldbachWorker::percent, this, &MainWindow::updateProgressBar);
-        this->connect( worker, &GoldbachWorker::finished, this, &MainWindow::workerFinished );
-        workers.append(worker);
-    }
-
-    for(int index = 0; index < workers.size(); ++index)
-    {
-        workers[index]->start();
-        double seconds = this->time.elapsed() / 1000.0;
-        std::cerr << index << ": " << seconds << std::endl;
-    }
+    this->goldbachCalculator->calculate(number);
 
 }
 
-void MainWindow::workerFinished()
+void MainWindow::calculationDone(long long sumCount)
 {
-
-    long long sumCount = 0; // = this->calculate(number);
-    this->stopped = true;
     double seconds = this->time.elapsed() / 1000.0;
     this->ui->pushButtonStart->setEnabled(true);
     this->ui->pushButtonStop->setEnabled(false);
     this->ui->statusBar->showMessage(tr("%1 sums found in %2 seconds").arg(sumCount).arg(seconds));
-
-    this->goldbachWorker->deleteLater(); // evitar eliminar el obj antes de que se ejec los eventos
 }
 

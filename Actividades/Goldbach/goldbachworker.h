@@ -25,6 +25,7 @@ class GoldbachWorker : public QThread
   signals: // eventos que genera el worker
     void sumFound(const QString& sum);
     void percent(int percent);
+    void calculationDone(long long sumCount);
 
   public slots:
 

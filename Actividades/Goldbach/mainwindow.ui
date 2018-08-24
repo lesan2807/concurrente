@@ -53,11 +53,7 @@
      </layout>
     </item>
     <item>
-     <widget class="QPlainTextEdit" name="plainTextEditResults">
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
-     </widget>
+     <widget class="QListView" name="listViewResults"/>
     </item>
    </layout>
   </widget>
@@ -67,7 +63,7 @@
      <x>0</x>
      <y>0</y>
      <width>400</width>
-     <height>22</height>
+     <height>17</height>
     </rect>
    </property>
   </widget>
