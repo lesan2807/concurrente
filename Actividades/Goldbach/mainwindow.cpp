@@ -1,6 +1,7 @@
 #include <QtMath>
 #include <QProgressBar>
 #include <QTime>
+#include <iostream>
 
 #include "goldbachworker.h"
 #include "mainwindow.h"
@@ -77,13 +78,29 @@ void MainWindow::startCalculation(long long number)
 
 
     this->time.start();
-
     this->stopped = false;
-    this->goldbachWorker = new GoldbachWorker(number, 0, 0, this);
-    this->connect(this->goldbachWorker, &GoldbachWorker::sumFound, this, &MainWindow::appendResult);
-    this->connect( this->goldbachWorker, &GoldbachWorker::finished, this, &MainWindow::workerFinished );
 
-    this->goldbachWorker->start(); // division de trabajo
+    QVector<GoldbachWorker*> workers;
+
+    int ideal = QThread::idealThreadCount() - 1;
+    for ( int current = 0; current < ideal; ++current  )
+    {
+        GoldbachWorker* worker = new GoldbachWorker(number, current, ideal, this);
+        // Hacer las conexiones para reaccionar cuando el worker:
+        // (1) encuentra una suma, (2) incrementa el porcentaje, (3) termina
+        this->connect(worker, &GoldbachWorker::sumFound, this, &MainWindow::appendResult);
+        //this->connect(worker, &GoldbachWorker::percent, this, &MainWindow::updateProgressBar);
+        this->connect( worker, &GoldbachWorker::finished, this, &MainWindow::workerFinished );
+        workers.append(worker);
+    }
+
+    for(int index = 0; index < workers.size(); ++index)
+    {
+        workers[index]->start();
+        double seconds = this->time.elapsed() / 1000.0;
+        std::cerr << index << ": " << seconds << std::endl;
+    }
+
 }
 
 void MainWindow::workerFinished()

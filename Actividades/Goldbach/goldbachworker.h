@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include <QThread>
+#include <QTime>
 
 class GoldbachWorker : public QThread
 {
@@ -11,17 +12,19 @@ class GoldbachWorker : public QThread
 
   protected:
     long long number;
-    int workerNumber;
-    int workerCount;
+    int workerCurrent;
+    int workerIdeal;
+    QTime time;
 
   public:
-    explicit GoldbachWorker(long long number, int workerNumber = 0 ,int workerCount = 0, QObject *parent = nullptr);
+    explicit GoldbachWorker(long long number, int current = 0 , int ideal = 0, QObject *parent = nullptr);
 
   protected:
     void run() override;
 
   signals: // eventos que genera el worker
     void sumFound(const QString& sum);
+    void percent(int percent);
 
   public slots:
 
@@ -62,6 +65,10 @@ class GoldbachWorker : public QThread
      * Por definicion 1 no es primo ni compuesto, este metodo retorna false
      */
     static bool isPrime(long long numero);
+
+  public:
+    long long initialRange();
+    long long finalRange();
 };
 
 #endif // GOLDBACHWORKER_H

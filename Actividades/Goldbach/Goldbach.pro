@@ -27,12 +27,10 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     goldbachworker.cpp \
-    goldbachworkermanager.cpp
 
 HEADERS += \
         mainwindow.h \
     goldbachworker.h \
-    goldbachworkermanager.h
 
 FORMS += \
         mainwindow.ui

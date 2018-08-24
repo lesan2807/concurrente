@@ -1,11 +1,13 @@
 #include "goldbachworker.h"
 #include <QtMath>
+#include <iostream>
 
-GoldbachWorker::GoldbachWorker(long long number, int workerNumber,int workerCount, QObject *parent)
+GoldbachWorker::GoldbachWorker(long long number, int current,int ideal, QObject *parent)
     : QThread(parent)
     , number(number)
-    , workerNumber{workerNumber}
-    , workerCount{workerCount}
+    , workerCurrent{current}
+    , workerIdeal{ideal}
+
 {
 
 }
@@ -17,6 +19,7 @@ void GoldbachWorker::run()
 
 long long GoldbachWorker::calculate(long long number)
 {
+    this->time.start();
     if ( number < 4 || number == 5 ) return 0;
     return number % 2 == 0 ? calculateEvenGoldbach(number) : calculateOddGoldbach(number);
 }
@@ -24,7 +27,7 @@ long long GoldbachWorker::calculate(long long number)
 long long GoldbachWorker::calculateEvenGoldbach(long long number)
 {
     long long results = 0;
-    for ( long long a = 2; a < number/2; ++a )
+    for ( long long a = this->initialRange(); a < this->finalRange(); ++a )
     {
         if ( ! isPrime(a) ) continue;
         long long b = number - a;
@@ -43,7 +46,7 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
 long long GoldbachWorker::calculateOddGoldbach(long long number)
 {
     long long results = 0;
-    for ( long long a = 2; a < number; ++a )
+    for ( long long a = this->initialRange(); a < this->finalRange(); ++a )
     {
         if ( ! isPrime(a) ) continue;
         for ( long long b = a; b < number/2; ++b )
@@ -72,4 +75,22 @@ bool GoldbachWorker::isPrime(long long number)
             return false;
 
     return true;
+}
+
+long long GoldbachWorker::initialRange()
+{
+    long long initialRange = 0;
+    long long division = (this->number-2)/this->workerIdeal;
+    initialRange = 2 + (this->workerCurrent*division);
+    return 0;
+}
+
+long long GoldbachWorker::finalRange()
+{
+    if (this->workerCurrent == this->workerIdeal-1)
+        return this->number/2;
+    long long initialRange = 0;
+    long long division = (this->number-2)/this->workerIdeal;
+    initialRange = 2 + ((this->workerCurrent+1)*division);
+    return 0;
 }
