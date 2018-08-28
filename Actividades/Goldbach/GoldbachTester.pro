@@ -8,7 +8,7 @@ QT       += core
 
 TARGET = GoldbachTester
 TEMPLATE = app
-CONFIG = console
+CONFIG += console
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -31,5 +31,5 @@ SOURCES += \
 HEADERS += \
     goldbachworker.h \
     goldbachcalculator.h \
-    goldbachtester.cpp
+    goldbachtester.h
 

@@ -10,6 +10,9 @@ class GoldbachTester : public QCoreApplication
 
 public:
     explicit GoldbachTester(int &argc, char **argv);
+    int run();
+    bool testDirectory(const QString& path);
+    bool testFile(const QString& path);
 
 signals:
 
