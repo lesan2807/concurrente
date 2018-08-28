@@ -16,7 +16,7 @@ GoldbachWorker::GoldbachWorker(long long number, int current,int ideal, QVector<
 void GoldbachWorker::run()
 {
     long long sumCount = this->calculate(this->number);
-    emit this->calculationDone(sumCount);
+    emit this->calculationDone(this->workerCurrent, sumCount);
 }
 
 long long GoldbachWorker::calculate(long long number)

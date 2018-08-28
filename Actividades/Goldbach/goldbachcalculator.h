@@ -12,8 +12,8 @@ class GoldbachCalculator : public QAbstractListModel
     Q_DISABLE_COPY(GoldbachCalculator)
 
   protected:
-    GoldbachWorker* goldbachWorker = nullptr;
-    int lastRowFetched = -1;
+    QVector<GoldbachWorker*> workers;
+    int lastRowFetched = 0;
     QVector<QString> results;
 
   public:
@@ -22,18 +22,18 @@ class GoldbachCalculator : public QAbstractListModel
     void stop();
 
   public: //obliga el modelo a usar esos métodos
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
   protected:
-    bool canFetchMore(const QModelIndex &parent) const override;
-    void fetchMore(const QModelIndex &parent) override;
+    virtual bool canFetchMore(const QModelIndex &parent) const override;
+    virtual void fetchMore(const QModelIndex &parent) override;
 
   signals:
-    void calculationDone(long long sumCount); //avisa que ha terminado los calculos
+    void calculationDone(int workerNumber, long long sumCount); //avisa que ha terminado los calculos
 
   protected slots:
-    void workerDone(long long sumCount); // cuando termina solo 1 worker
+    void workerDone(int workerNumber, long long sumCount); // cuando termina solo 1 worker
 
 };
 

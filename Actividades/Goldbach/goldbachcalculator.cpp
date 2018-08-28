@@ -10,38 +10,21 @@ GoldbachCalculator::GoldbachCalculator(QObject *parent)
 void GoldbachCalculator::calculate(long long number)
 {
     this->beginResetModel();
-    this->goldbachWorker = new GoldbachWorker(number, 0, 0, this->results, this);
-    this->connect(goldbachWorker, &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone); //terminó el trabajador
-    this->goldbachWorker->start();
-
-//    QVector<GoldbachWorker*> workers;
-
-//    int ideal = QThread::idealThreadCount() - 1;
-//    for ( int current = 0; current < ideal; ++current  )
-//    {
-//        GoldbachWorker* worker = new GoldbachWorker(number, current, ideal, this);
-//        // Hacer las conexiones para reaccionar cuando el worker:
-//        // (1) encuentra una suma, (2) incrementa el porcentaje, (3) termina
-//        this->connect(worker, &GoldbachWorker::sumFound, this, &MainWindow::appendResult);
-//        //this->connect(worker, &GoldbachWorker::percent, this, &MainWindow::updateProgressBar);
-//        this->connect( worker, &GoldbachWorker::finished, this, &MainWindow::workerFinished );
-//        workers.append(worker);
-//    }
-
-//    for(int index = 0; index < workers.size(); ++index)
-//    {
-//        workers[index]->start();
-//        double seconds = this->time.elapsed() / 1000.0;
-//        std::cerr << index << ": " << seconds << std::endl;
-//    }
-
+    int ideal = QThread::idealThreadCount() - 1;
+    for (int current = 0; current < ideal; ++current)
+    {
+        this->workers.append( new GoldbachWorker(number, current, ideal, this->results, this) );
+        this->workers[current]->connect( this->workers[current], &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
+        this->workers[current]->start();
+    }
+    this->lastRowFetched = 0;
     this->endResetModel();
 }
 
 void GoldbachCalculator::stop()
 {
-    Q_ASSERT(this->goldbachWorker);
-    this->goldbachWorker->requestInterruption();
+//    Q_ASSERT(this->goldbachWorker);
+//    this->goldbachWorker->requestInterruption();
 }
 
 int GoldbachCalculator::rowCount(const QModelIndex &parent) const //interfaz no se enloquezca, cantidad que pide el usuario
@@ -91,11 +74,12 @@ void GoldbachCalculator::fetchMore(const QModelIndex &parent)
 
 }
 
-void GoldbachCalculator::workerDone(long long sumCount)
+void GoldbachCalculator::workerDone(int workerNumber, long long sumCount)
 {
-    emit this->calculationDone(sumCount);
-    this->goldbachWorker->deleteLater(); // evitar eliminar el obj antes de que se ejec los eventos
-    this->goldbachWorker = nullptr;
+    emit this->calculationDone(workerNumber, sumCount);
+    this->workers[workerNumber]->deleteLater();
+    this->workers[workerNumber] = nullptr;
+
 }
 
 

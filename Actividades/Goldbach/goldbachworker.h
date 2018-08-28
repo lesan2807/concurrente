@@ -12,9 +12,9 @@ class GoldbachWorker : public QThread
     Q_OBJECT
 
   protected:
-    long long number;
-    int workerCurrent;
-    int workerIdeal;
+    long long number = 0;
+    int workerCurrent = 0;
+    int workerIdeal = 1;
     QTime time;
     QVector<QString>& results;
 
@@ -25,8 +25,7 @@ class GoldbachWorker : public QThread
     void run() override;
 
   signals: // eventos que genera el worker
-    void percent(int percent);
-    void calculationDone(long long sumCount);
+    void calculationDone(int workerNumber, long long sumCount);
 
   public slots:
 
