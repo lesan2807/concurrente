@@ -4,12 +4,11 @@ nemo#-------------------------------------------------
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-TARGET = Goldbach
+TARGET = GoldbachTester
 TEMPLATE = app
+CONFIG = console
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -24,18 +23,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
     goldbachworker.cpp \
     goldbachcalculator.cpp \
     test.cpp \
     goldbachtester.cpp
 
 HEADERS += \
-        mainwindow.h \
     goldbachworker.h \
     goldbachcalculator.h \
-    goldbachtester.h
+    goldbachtester.cpp
 
-FORMS += \
-        mainwindow.ui
