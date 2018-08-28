@@ -75,8 +75,9 @@ void MainWindow::startCalculation(long long number)
 
 }
 
-void MainWindow::calculationDone(long long sumCount)
+void MainWindow::calculationDone(int index, long long sumCount)
 {
+    Q_UNUSED(index);
     double seconds = this->time.elapsed() / 1000.0;
     this->ui->pushButtonStart->setEnabled(true);
     this->ui->pushButtonStop->setEnabled(false);

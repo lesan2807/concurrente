@@ -1,5 +1,6 @@
 #include "goldbachcalculator.h"
 #include "goldbachworker.h"
+#include <iostream>
 
 GoldbachCalculator::GoldbachCalculator(QObject *parent)
     : QAbstractListModel(parent)
@@ -76,7 +77,8 @@ void GoldbachCalculator::fetchMore(const QModelIndex &parent)
 
 void GoldbachCalculator::workerDone(int workerNumber, long long sumCount)
 {
-    emit this->calculationDone(workerNumber, sumCount);
+    Q_UNUSED(sumCount);
+    emit this->calculationDone(workerNumber, results.size());
     this->workers[workerNumber]->deleteLater();
     this->workers[workerNumber] = nullptr;
 

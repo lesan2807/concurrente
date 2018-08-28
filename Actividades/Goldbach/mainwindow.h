@@ -38,7 +38,7 @@ class MainWindow : public QMainWindow
     void on_pushButtonStop_clicked();
 
   protected slots:
-    void calculationDone(long long sumCount);
+    void calculationDone(int index, long long sumCount);
 
 };
 
