@@ -25,7 +25,12 @@ void GoldbachCalculator::calculate(long long number)
 void GoldbachCalculator::stop()
 {
 //    Q_ASSERT(this->goldbachWorker);
-//    this->goldbachWorker->requestInterruption();
+    //    this->goldbachWorker->requestInterruption();
+}
+
+QVector<QString> GoldbachCalculator::getAllSums() const
+{
+    return this->results;
 }
 
 int GoldbachCalculator::rowCount(const QModelIndex &parent) const //interfaz no se enloquezca, cantidad que pide el usuario

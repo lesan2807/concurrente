@@ -20,6 +20,7 @@ class GoldbachCalculator : public QAbstractListModel
     explicit GoldbachCalculator(QObject *parent = nullptr);
     void calculate(long long number);
     void stop();
+    QVector<QString> getAllSums() const;
 
   public: //obliga el modelo a usar esos métodos
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
