@@ -24,18 +24,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
+    main.cpp \
+    mainwindow.cpp \
     goldbachworker.cpp \
     goldbachcalculator.cpp \
-    test.cpp \
-    goldbachtester.cpp
 
 HEADERS += \
-        mainwindow.h \
+    mainwindow.h \
     goldbachworker.h \
     goldbachcalculator.h \
-    goldbachtester.h
-
+    
 FORMS += \
         mainwindow.ui

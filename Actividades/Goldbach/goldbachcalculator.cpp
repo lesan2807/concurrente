@@ -24,8 +24,12 @@ void GoldbachCalculator::calculate(long long number)
 
 void GoldbachCalculator::stop()
 {
-//    Q_ASSERT(this->goldbachWorker);
-    //    this->goldbachWorker->requestInterruption();
+    Q_ASSERT(this);
+    int ideal = QThread::idealThreadCount() - 1;
+    for(int current = 0; current < ideal; ++current)
+    {
+        this->workers[current]->requestInterruption();
+    }
 }
 
 QVector<QString> GoldbachCalculator::getAllSums() const
