@@ -28,7 +28,8 @@ void GoldbachCalculator::stop()
     int ideal = QThread::idealThreadCount() - 1;
     for(int current = 0; current < ideal; ++current)
     {
-        this->workers[current]->requestInterruption();
+        if(this->workers[current] != nullptr)
+            this->workers[current]->requestInterruption();
     }
 }
 
