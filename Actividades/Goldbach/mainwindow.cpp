@@ -27,7 +27,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateProgressBar(int percent)
 {
-    this->progressBar->setValue(percent);
+    this->progressBar->setValue(this->goldbachCalculator->percent());
 }
 
 void MainWindow::on_lineEditNumber_textEdited(const QString &arg1)
@@ -65,14 +65,12 @@ void MainWindow::startCalculation(long long number)
 {
     this->ui->pushButtonStart->setEnabled(false);
     this->ui->pushButtonStop->setEnabled(true);
-
     this->goldbachCalculator = new GoldbachCalculator(this);
     this->ui->listViewResults->setModel( goldbachCalculator );
     this->connect(this->goldbachCalculator, &GoldbachCalculator::calculationDone, this, &MainWindow::calculationDone);
     this->ui->statusBar->showMessage(tr("Calculating..."));
     this->time.start();
     this->goldbachCalculator->calculate(number);
-
 }
 
 void MainWindow::calculationDone(int index, long long sumCount)

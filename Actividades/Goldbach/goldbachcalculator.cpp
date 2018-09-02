@@ -1,6 +1,7 @@
 #include "goldbachcalculator.h"
 #include "goldbachworker.h"
 #include <iostream>
+#include <algorithm>
 
 GoldbachCalculator::GoldbachCalculator(QObject *parent)
     : QAbstractListModel(parent)
@@ -37,6 +38,12 @@ QVector<QString> GoldbachCalculator::getAllSums() const
 {
     return this->results;
 }
+
+int GoldbachCalculator::percent()
+{
+    return 100;
+}
+
 
 int GoldbachCalculator::rowCount(const QModelIndex &parent) const //interfaz no se enloquezca, cantidad que pide el usuario
 {

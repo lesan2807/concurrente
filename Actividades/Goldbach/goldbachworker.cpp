@@ -34,14 +34,17 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
         if ( ! isPrime(a) ) continue;
         long long b = number - a;
         if ( b >= a && isPrime(b) )
-            this->results.append( tr("%1: %2 + %3").arg(++results).arg(a).arg(b) );
-
-//        // Update the progress bar
-//        this->updateProgressBar((a + 1) * 100 / number);
+        {
+            this->results.append( tr("%1: %2 + %3").arg(this->results.count()+1).arg(a).arg(b) );
+            ++results;
+        }
         // If user cancelled, stop calculations
         if ( this->isInterruptionRequested() )
             return results;
     }
+    double seconds = this->time.elapsed() / 1000.0;
+    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds
+              << "sums found: " << results << std::endl;
     return results;
 }
 
@@ -56,15 +59,19 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
             if ( ! isPrime(b) ) continue;
             long long c = number - a - b;
             if ( c >= b && isPrime(c) )
-                this->results.append(tr("%1: %2 + %3 + %4").arg(++results).arg(a).arg(b).arg(c) );
+            {
+                this->results.append(tr("%1: %2 + %3 + %4").arg(this->results.count()+1).arg(a).arg(b).arg(c) );
+                ++results;
+            }
 
-//            // Update the progress bar
-//            this->updateProgressBar((a + 1) * 100 / number);
             // If user cancelled, stop calculations
             if ( this->isInterruptionRequested() )
                 return results;
         }
     }
+    double seconds = this->time.elapsed() / 1000.0;
+    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds
+              << " sums found: " << results << std::endl;
     return results;
 }
 
