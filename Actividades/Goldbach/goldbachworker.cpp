@@ -54,7 +54,7 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
     for ( long long a = this->initialRange(); a < this->finalRange(); ++a )
     {
         if ( ! isPrime(a) ) continue;
-        for ( long long b = a; b < number/2; ++b )
+        for ( long long b = a; b < number; ++b )
         {
             if ( ! isPrime(b) ) continue;
             long long c = number - a - b;
