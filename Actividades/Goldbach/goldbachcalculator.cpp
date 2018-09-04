@@ -43,10 +43,14 @@ void GoldbachCalculator::stop()
 QVector<QString> GoldbachCalculator::getAllSums() const
 {
     QVector<QString> allSums;
+    int count = 1;
     for(int index = 0; index < this->results.size(); ++index)
     {
-        for(int indexSums = 0; indexSums < this->results.at(index).count(); ++index)
-            allSums.append(this->results[index][indexSums]);
+        for(int indexSums = 0; indexSums < this->results[index].size(); ++indexSums)
+        {
+            allSums.append(tr("%1. %2").arg(count).arg(this->results[index][indexSums]));
+            ++count;
+        }
     }
     return allSums;
 }
@@ -56,22 +60,10 @@ int GoldbachCalculator::percent()
     return 100;
 }
 
-long long GoldbachCalculator::sumsFound()
+long long GoldbachCalculator::sumsFound() const
 {
-    long long sums = 0;
-    for(int index = 0; index < this->results.size(); ++index)
-    {
-        sums += this->results[index].size();
-    }
-    return sums;
-}
-
-void GoldbachCalculator::printSums(int workerId)
-{
-    for(int indexString = 0; indexString < this->results.at(workerId).size(); ++indexString)
-    {
-        std::cerr << workerId << ": " << this->results.at(workerId).at(indexString).toStdString() << std::endl;
-    }
+    QVector<QString> allSums = getAllSums();
+    return allSums.count();
 }
 
 
@@ -85,16 +77,16 @@ QVariant GoldbachCalculator::data(const QModelIndex &index, int role) const
 {
     // dar cuantas filas quiere
     // cada vez que se necesita una 2fila se invoca data
+    QVector<QString> resultados = this->getAllSums();
     if (!index.isValid())
            return QVariant();
 
-   if (index.row() < 0 || index.row() >= this->results.size())
+   if (index.row() < 0 || index.row() >= this->sumsFound())
        return QVariant();
 
    if (role == Qt::DisplayRole)
    {
-       return QVariant();
-       //return this->results[ index.row() ];
+       return resultados[index.row()];
    }
 
    return QVariant();
@@ -103,13 +95,13 @@ QVariant GoldbachCalculator::data(const QModelIndex &index, int role) const
 bool GoldbachCalculator::canFetchMore(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return this->lastRowFetched < this->results.count();
+    return this->lastRowFetched < this->sumsFound() ;
 }
 
 void GoldbachCalculator::fetchMore(const QModelIndex &parent)
 {
     Q_UNUSED(parent);
-    int remainder = this->results.size() - this->lastRowFetched;
+    int remainder = this->sumsFound() - this->lastRowFetched;
     int itemsToFetch = qMin(100, remainder);
 
     if (itemsToFetch <= 0)
@@ -127,7 +119,6 @@ void GoldbachCalculator::workerDone(int workerNumber, long long sumCount)
 {
     Q_UNUSED(sumCount);
     emit this->calculationDone(workerNumber, this->sumsFound());
-    this->printSums(workerNumber);
     this->workers[workerNumber]->deleteLater();
     this->workers[workerNumber] = nullptr;
 }

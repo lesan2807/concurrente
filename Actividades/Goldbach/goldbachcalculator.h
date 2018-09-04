@@ -14,6 +14,7 @@ class GoldbachCalculator : public QAbstractListModel
   protected:
     QVector<GoldbachWorker*> workers;
     int lastRowFetched = 0;
+    int countRows = 0;
     QVector<QVector<QString>> results;
 
   public:
@@ -22,8 +23,7 @@ class GoldbachCalculator : public QAbstractListModel
     void stop();
     QVector<QString> getAllSums() const;
     int percent();
-    long long sumsFound();
-    void printSums(int workerId);
+    long long sumsFound() const;
 
   public: //obliga el modelo a usar esos métodos
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
