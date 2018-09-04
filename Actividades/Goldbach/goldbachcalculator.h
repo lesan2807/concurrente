@@ -14,7 +14,7 @@ class GoldbachCalculator : public QAbstractListModel
   protected:
     QVector<GoldbachWorker*> workers;
     int lastRowFetched = 0;
-    QVector<QVector<QString>*> results;
+    QVector<QVector<QString>> results;
 
   public:
     explicit GoldbachCalculator(QObject *parent = nullptr);

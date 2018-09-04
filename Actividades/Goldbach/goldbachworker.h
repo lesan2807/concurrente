@@ -16,11 +16,10 @@ class GoldbachWorker : public QThread
     int workerCurrent = 0;
     int workerIdeal = 1;
     QTime time;
-    QVector<QString>* sums;
-    QVector<QVector<QString>*>& results;
+    QVector<QString>& sums;
 
   public:
-    explicit GoldbachWorker(long long number, int current, int ideal, QVector<QVector<QString>*>& results, QObject *parent = nullptr);
+    explicit GoldbachWorker(long long number, int current, int ideal, QVector<QString>& sums, QObject *parent = nullptr);
 
   protected:
     void run() override;

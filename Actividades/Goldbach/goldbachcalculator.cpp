@@ -13,15 +13,20 @@ void GoldbachCalculator::calculate(long long number)
 {
     this->beginResetModel();
     int ideal = QThread::idealThreadCount() - 1;
+
+    //this->results.resize(ideal);
+    for(int index = 0; index < ideal; ++index)
+        this->results.append(QVector<QString>());
+
     for (int current = 0; current < ideal; ++current)
     {
-        this->workers.append( new GoldbachWorker(number, current, ideal, this->results, this) );
+        GoldbachWorker* worker = new GoldbachWorker(number, current, ideal, this->results[current], this);
+        this->workers.append(worker);
         this->workers[current]->connect( this->workers[current], &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
         this->workers[current]->start();
     }
     this->lastRowFetched = 0;
     this->endResetModel();
-
 }
 
 void GoldbachCalculator::stop()
@@ -37,8 +42,13 @@ void GoldbachCalculator::stop()
 // Method for tester:
 QVector<QString> GoldbachCalculator::getAllSums() const
 {
-    return QVector<QString>();
-    //return this->results;
+    QVector<QString> allSums;
+    for(int index = 0; index < this->results.size(); ++index)
+    {
+        for(int indexSums = 0; indexSums < this->results.at(index).count(); ++index)
+            allSums.append(this->results[index][indexSums]);
+    }
+    return allSums;
 }
 
 int GoldbachCalculator::percent()
@@ -51,16 +61,16 @@ long long GoldbachCalculator::sumsFound()
     long long sums = 0;
     for(int index = 0; index < this->results.size(); ++index)
     {
-        sums += this->results[index]->size();
+        sums += this->results[index].size();
     }
     return sums;
 }
 
 void GoldbachCalculator::printSums(int workerId)
 {
-    for(int indexString = 0; indexString < this->results.at(workerId)->size(); ++indexString)
+    for(int indexString = 0; indexString < this->results.at(workerId).size(); ++indexString)
     {
-        std::cerr << workerId << ": " << this->results.at(workerId)->at(indexString).toStdString() << std::endl;
+        std::cerr << workerId << ": " << this->results.at(workerId).at(indexString).toStdString() << std::endl;
     }
 }
 
