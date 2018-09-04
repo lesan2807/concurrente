@@ -2,21 +2,21 @@
 #include <QtMath>
 #include <iostream>
 
-GoldbachWorker::GoldbachWorker(long long number, int current,int ideal, QVector<QString>& results, QObject *parent)
+GoldbachWorker::GoldbachWorker(long long number, int current, int ideal, QVector<QVector<QString>*>& results, QObject *parent)
     : QThread(parent)
     , number(number)
     , workerCurrent{current}
     , workerIdeal{ideal}
     , results{results}
-
 {
-
+    this->sums = new QVector<QString>();
 }
 
 void GoldbachWorker::run()
 {
     long long sumCount = this->calculate(this->number);
-    emit this->calculationDone(this->workerCurrent, sumCount);
+    this->results.append(this->sums);
+    emit this->calculationDone(this->workerCurrent, this->sums->count());
 }
 
 long long GoldbachWorker::calculate(long long number)
@@ -35,7 +35,7 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
         long long b = number - a;
         if ( b >= a && isPrime(b) )
         {
-            this->results.append( tr("%1: %2 + %3").arg(this->results.count()+1).arg(a).arg(b) );
+            this->sums->append( tr("%1: %2 + %3").arg(this->results.count()+1).arg(a).arg(b) );
             ++results;
         }
         // If user cancelled, stop calculations
@@ -43,8 +43,8 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
             return results;
     }
     double seconds = this->time.elapsed() / 1000.0;
-    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds
-              << "sums found: " << results << std::endl;
+//    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds << "sums found: " << results << std::endl;
+//    std::cerr << "initial: " << this->initialRange() << " final: " << this->finalRange() << std::endl;
     return results;
 }
 
@@ -60,7 +60,7 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
             long long c = number - a - b;
             if ( c >= b && isPrime(c) )
             {
-                this->results.append(tr("%1: %2 + %3 + %4").arg(this->results.count()+1).arg(a).arg(b).arg(c) );
+                this->sums->append(tr("%1: %2 + %3 + %4").arg(this->results.count()+1).arg(a).arg(b).arg(c) );
                 ++results;
             }
 
@@ -70,8 +70,8 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
         }
     }
     double seconds = this->time.elapsed() / 1000.0;
-    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds
-              << " sums found: " << results << std::endl;
+//    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds  << " sums found: " << results << std::endl;
+//    std::cerr << "initial: " << this->initialRange() << " final: " << this->finalRange() << std::endl;
     return results;
 }
 

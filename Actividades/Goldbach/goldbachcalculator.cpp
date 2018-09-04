@@ -21,27 +21,47 @@ void GoldbachCalculator::calculate(long long number)
     }
     this->lastRowFetched = 0;
     this->endResetModel();
+
 }
 
 void GoldbachCalculator::stop()
 {
-    Q_ASSERT(this);
     int ideal = QThread::idealThreadCount() - 1;
     for(int current = 0; current < ideal; ++current)
     {
-        if(this->workers[current] != nullptr)
-            this->workers[current]->requestInterruption();
+        Q_ASSERT(this->workers[current]);
+        this->workers[current]->requestInterruption();
     }
 }
 
+// Method for tester:
 QVector<QString> GoldbachCalculator::getAllSums() const
 {
-    return this->results;
+    return QVector<QString>();
+    //return this->results;
 }
 
 int GoldbachCalculator::percent()
 {
     return 100;
+}
+
+long long GoldbachCalculator::sumsFound()
+{
+    long long sums = 0;
+    for(int index = 0; index < this->results.size(); ++index)
+    {
+        sums += this->results[index]->size();
+    }
+    return sums;
+}
+
+void GoldbachCalculator::printSums(int workerId)
+{
+    for(int indexString = 0; indexString < this->results.at(workerId)->size(); ++indexString)
+    {
+        std::cerr << workerId << ": " << this->results.at(workerId)->at(indexString).toStdString() << std::endl;
+    }
 }
 
 
@@ -63,7 +83,8 @@ QVariant GoldbachCalculator::data(const QModelIndex &index, int role) const
 
    if (role == Qt::DisplayRole)
    {
-       return this->results[ index.row() ];
+       return QVariant();
+       //return this->results[ index.row() ];
    }
 
    return QVariant();
@@ -95,10 +116,10 @@ void GoldbachCalculator::fetchMore(const QModelIndex &parent)
 void GoldbachCalculator::workerDone(int workerNumber, long long sumCount)
 {
     Q_UNUSED(sumCount);
-    emit this->calculationDone(workerNumber, results.size());
+    emit this->calculationDone(workerNumber, this->sumsFound());
+    this->printSums(workerNumber);
     this->workers[workerNumber]->deleteLater();
     this->workers[workerNumber] = nullptr;
-
 }
 
 

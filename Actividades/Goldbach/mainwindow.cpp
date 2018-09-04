@@ -65,9 +65,11 @@ void MainWindow::startCalculation(long long number)
 {
     this->ui->pushButtonStart->setEnabled(false);
     this->ui->pushButtonStop->setEnabled(true);
+
     this->goldbachCalculator = new GoldbachCalculator(this);
     this->ui->listViewResults->setModel( goldbachCalculator );
     this->connect(this->goldbachCalculator, &GoldbachCalculator::calculationDone, this, &MainWindow::calculationDone);
+
     this->ui->statusBar->showMessage(tr("Calculating..."));
     this->time.start();
     this->goldbachCalculator->calculate(number);
