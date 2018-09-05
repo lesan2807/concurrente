@@ -4,3 +4,7 @@ build-*
 *.exe
 *.dSYM
 *.autosave
+moc*
+*.qmake
+Makefile
+*.qmake.stash

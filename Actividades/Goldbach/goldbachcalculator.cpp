@@ -11,12 +11,12 @@ GoldbachCalculator::GoldbachCalculator(QObject *parent)
 
 void GoldbachCalculator::calculate(long long number)
 {
+
     this->beginResetModel();
     int ideal = QThread::idealThreadCount() - 1;
-
-    //this->results.resize(ideal);
+    this->results.resize(ideal);
     for(int index = 0; index < ideal; ++index)
-        this->results.append(QVector<QString>());
+        this->results[index] = QVector<QString>();
 
     for (int current = 0; current < ideal; ++current)
     {
@@ -48,7 +48,7 @@ QVector<QString> GoldbachCalculator::getAllSums() const
     {
         for(int indexSums = 0; indexSums < this->results[index].size(); ++indexSums)
         {
-            allSums.append(tr("%1. %2").arg(count).arg(this->results[index][indexSums]));
+            allSums.append(tr("%1: %2").arg(count).arg(this->results[index][indexSums]));
             ++count;
         }
     }
@@ -65,6 +65,15 @@ long long GoldbachCalculator::sumsFound() const
     QVector<QString> allSums = getAllSums();
     return allSums.count();
 }
+
+void GoldbachCalculator::printSums() const
+{
+    QVector<QString> allSums = getAllSums();
+    for(int index = 0; index < allSums.count(); ++index)
+        std::cerr << allSums[index].toStdString() << std::endl;
+}
+
+
 
 
 int GoldbachCalculator::rowCount(const QModelIndex &parent) const //interfaz no se enloquezca, cantidad que pide el usuario
@@ -118,9 +127,11 @@ void GoldbachCalculator::fetchMore(const QModelIndex &parent)
 void GoldbachCalculator::workerDone(int workerNumber, long long sumCount)
 {
     Q_UNUSED(sumCount);
-    emit this->calculationDone(workerNumber, this->sumsFound());
     this->workers[workerNumber]->deleteLater();
     this->workers[workerNumber] = nullptr;
+    this->printSums();
+    emit this->calculationDone(workerNumber, this->sumsFound());
+
 }
 
 

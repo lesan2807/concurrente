@@ -42,8 +42,8 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
             return results;
     }
     double seconds = this->time.elapsed() / 1000.0;
-//    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds << "sums found: " << results << std::endl;
-//    std::cerr << "initial: " << this->initialRange() << " final: " << this->finalRange() << std::endl;
+//    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds << " sums found: " << results << " Range: " << this->initialRange() << "-" << this->finalRange() << std::endl;
+//    std::cerr << std::endl;
     return results;
 }
 
@@ -59,6 +59,7 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
             long long c = number - a - b;
             if ( c >= b && isPrime(c) )
             {
+
                 this->sums.append(tr("%2 + %3 + %4").arg(a).arg(b).arg(c) );
                 ++results;
             }
@@ -69,8 +70,8 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
         }
     }
     double seconds = this->time.elapsed() / 1000.0;
-//    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds  << " sums found: " << results << std::endl;
-//    std::cerr << "initial: " << this->initialRange() << " final: " << this->finalRange() << std::endl;
+//    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds << " sums found: " << results << "Range: " << this->initialRange() << "-" << this->finalRange() << std::endl;
+//    std::cerr << std::endl;
     return results;
 }
 

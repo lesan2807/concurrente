@@ -14,6 +14,10 @@ class GoldbachTester : public QCoreApplication
 
 protected:
     QMap<GoldbachCalculator*, QFileInfo> calculators;
+    int passed = 0;
+    int failed = 0;
+    int total = 0;
+
 
 public:
     explicit GoldbachTester(int &argc, char **argv);
@@ -21,6 +25,8 @@ public:
     bool testDirectory(const QString& path);
     bool testFile(const QFileInfo &fileInfo);
     static QVector<QString> loadLines(const QFileInfo& fileInfo);
+    int percentPassed() const;
+    int percentFailed() const;
 
 signals:
 

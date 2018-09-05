@@ -15,9 +15,13 @@ GoldbachTester::GoldbachTester(int &argc, char **argv)
 
 int GoldbachTester::run()
 {
+    if(this->arguments().count() < 1)
+        return std::cerr << "Usage: GoldbachTester test_folder1 test_folder2 ... test_folderN" << std::endl, 2;
+
     for( int index = 1; index < this->arguments().count(); ++index )
     {
-        this->testDirectory(this->arguments()[index]);
+        if( ! this->testDirectory(this->arguments()[index]) )
+            return 3;
     }
 
     return this->exec();
@@ -34,6 +38,8 @@ bool GoldbachTester::testDirectory(const QString &path)
     for ( int index = 0; index < fileList.count(); ++index)
         this->testFile( fileList[index].absoluteFilePath() );
         // std::cout << "Processing file " << qPrintable( fileList[index].absoluteFilePath() ) << std::endl;
+    if(fileList.count() == 0)
+        return false;
 
     return true;
 }
@@ -48,6 +54,7 @@ bool GoldbachTester::testFile(const QFileInfo& fileInfo)
 
     GoldbachCalculator* goldbachCalculator = new GoldbachCalculator(this);
     this->calculators.insert( goldbachCalculator, fileInfo );
+    ++this->total;
     this->connect(goldbachCalculator, &GoldbachCalculator::calculationDone, this, &GoldbachTester::calculationDone);
     goldbachCalculator->calculate(number); // eso hace que una cosa que vaya corriendo paralelo siguente. el codigo dejo de ser secuencial. y queremos los resultados, y guardarlos en un arreglo de strings.
 
@@ -68,6 +75,16 @@ QVector<QString> GoldbachTester::loadLines(const QFileInfo &fileInfo)
     return result;
 }
 
+int GoldbachTester::percentPassed() const
+{
+    return (this->passed*100)/this->total;
+}
+
+int GoldbachTester::percentFailed() const
+{
+    return (this->failed*100)/this->total;
+}
+
 void GoldbachTester::calculationDone(long long sumCount)
 {
     Q_UNUSED(sumCount)
@@ -77,13 +94,23 @@ void GoldbachTester::calculationDone(long long sumCount)
     QFileInfo fileInfo = this->calculators.value(goldbachCalculator);
 
     const QVector<QString>& calculatorSums = goldbachCalculator->getAllSums();
-    const QVector<QString>& expectedSums = loadLines( fileInfo );
-    if( calculatorSums != expectedSums )
-        std::cerr << "test case failed: " << qPrintable(fileInfo.fileName()) << std::endl;
+    if( fileInfo.baseName() != "" )
+    {
+        const QVector<QString>& expectedSums = loadLines( fileInfo );
+        if( calculatorSums != expectedSums )
+            ++this->failed;
+        else
+            ++this->passed;
+    }
+
 
     this->calculators.remove(goldbachCalculator);
     goldbachCalculator->deleteLater();
 
     if( this->calculators.count() <= 0 )
+    {
+        std::cerr << this->total << " test cases: " << this->passed << " passed (" << this->percentPassed() << "%), " << this->failed << " failed (" << this->percentFailed() << "%)."  << std::endl;
         this->quit();
+    }
+
 }
