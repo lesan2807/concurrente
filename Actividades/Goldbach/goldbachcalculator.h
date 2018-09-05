@@ -25,6 +25,7 @@ class GoldbachCalculator : public QAbstractListModel
     int percent();
     long long sumsFound() const;
     void printSums() const;
+    bool allWorkersDone();
 
   public: //obliga el modelo a usar esos métodos
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;

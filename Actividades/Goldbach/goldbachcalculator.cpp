@@ -73,6 +73,19 @@ void GoldbachCalculator::printSums() const
         std::cerr << allSums[index].toStdString() << std::endl;
 }
 
+bool GoldbachCalculator::allWorkersDone()
+{
+    int count = 0;
+    for(int index = 0; index < this->workers.count(); ++index)
+    {
+        if(this->workers[index] == nullptr)
+            ++count;
+    }
+    if( count == this->workers.count() )
+        return true;
+    return false;
+}
+
 
 
 
@@ -129,8 +142,9 @@ void GoldbachCalculator::workerDone(int workerNumber, long long sumCount)
     Q_UNUSED(sumCount);
     this->workers[workerNumber]->deleteLater();
     this->workers[workerNumber] = nullptr;
-    this->printSums();
-    emit this->calculationDone(workerNumber, this->sumsFound());
+    //this->printSums();
+    if( this->allWorkersDone()  )
+        emit this->calculationDone(workerNumber, this->sumsFound());
 
 }
 

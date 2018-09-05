@@ -34,6 +34,7 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
         long long b = number - a;
         if ( b >= a && isPrime(b) )
         {
+
             this->sums.append( tr("%2 + %3").arg(a).arg(b) );
             ++results;
         }
@@ -49,7 +50,9 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
 
 long long GoldbachWorker::calculateOddGoldbach(long long number)
 {
+
     long long results = 0;
+    this->sums.resize(number);
     for ( long long a = this->initialRange(); a < this->finalRange(); ++a )
     {
         if ( ! isPrime(a) ) continue;
@@ -60,8 +63,9 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
             if ( c >= b && isPrime(c) )
             {
 
-                this->sums.append(tr("%2 + %3 + %4").arg(a).arg(b).arg(c) );
                 ++results;
+                this->sums.append(tr("%2 + %3 + %4").arg(a).arg(b).arg(c) );
+
             }
 
             // If user cancelled, stop calculations

@@ -1,6 +1,8 @@
 #include <iostream>
+
 #include <QDir>
 #include <QFile>
+#include <QtMath>
 #include <QTextStream>
 
 #include "goldbachcalculator.h"
@@ -77,12 +79,12 @@ QVector<QString> GoldbachTester::loadLines(const QFileInfo &fileInfo)
 
 int GoldbachTester::percentPassed() const
 {
-    return (this->passed*100)/this->total;
+    return qCeil((this->passed*100)/this->total);
 }
 
 int GoldbachTester::percentFailed() const
 {
-    return (this->failed*100)/this->total;
+    return qCeil((this->failed*100)/this->total);
 }
 
 void GoldbachTester::calculationDone(long long sumCount)
@@ -97,15 +99,17 @@ void GoldbachTester::calculationDone(long long sumCount)
     if( fileInfo.baseName() != "" )
     {
         const QVector<QString>& expectedSums = loadLines( fileInfo );
-        if( calculatorSums != expectedSums )
+        if( ! compareSums(calculatorSums, expectedSums) )
             ++this->failed;
         else
             ++this->passed;
+        this->calculators.remove(goldbachCalculator);
+        goldbachCalculator->deleteLater();
+
     }
 
 
-    this->calculators.remove(goldbachCalculator);
-    goldbachCalculator->deleteLater();
+
 
     if( this->calculators.count() <= 0 )
     {
