@@ -52,7 +52,6 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
 {
 
     long long results = 0;
-    this->sums.resize(number);
     for ( long long a = this->initialRange(); a < this->finalRange(); ++a )
     {
         if ( ! isPrime(a) ) continue;
