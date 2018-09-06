@@ -15,14 +15,13 @@ void GoldbachCalculator::calculate(long long number)
     this->beginResetModel();
     int ideal = QThread::idealThreadCount() - 1;
     this->results.resize(ideal);
-    for(int index = 0; index < ideal; ++index)
-        this->results[index] = QVector<QString>();
 
     for (int current = 0; current < ideal; ++current)
     {
         GoldbachWorker* worker = new GoldbachWorker(number, current, ideal, this->results[current], this);
         this->workers.append(worker);
-        this->workers[current]->connect( this->workers[current], &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
+        this->connect(this->workers[current], &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
+        //this->workers[current]->connect( this->workers[current], &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
         this->workers[current]->start();
     }
     this->lastRowFetched = 0;
@@ -62,8 +61,10 @@ int GoldbachCalculator::percent()
 
 long long GoldbachCalculator::sumsFound() const
 {
-    QVector<QString> allSums = getAllSums();
-    return allSums.count();
+    long long count = 0;
+    for(int index = 0; index < this->results.count(); ++index)
+        count += this->results[index].count();
+    return count;
 }
 
 void GoldbachCalculator::printSums() const
