@@ -27,7 +27,7 @@ public:
     static QVector<QString> loadLines(const QFileInfo& fileInfo);
     int percentPassed() const;
     int percentFailed() const;
-    bool compareSums(QVector<QString> results, QVector<QString> expected);
+    bool compareSums(const QFileInfo& fileInfo, const QVector<QString> &results, const QVector<QString> &expected);
 
 signals:
 

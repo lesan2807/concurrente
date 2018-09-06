@@ -87,9 +87,22 @@ int GoldbachTester::percentFailed() const
     return qCeil((this->failed*100)/this->total);
 }
 
-bool GoldbachTester::compareSums(QVector<QString> results, QVector<QString> expected)
+bool GoldbachTester::compareSums(const QFileInfo &fileInfo, const QVector<QString> &results, const QVector<QString> &expected)
 {
-    return false;
+    for(int index = 0; index < expected.count(); ++index)
+    {
+        if( expected[index]  == "")
+            return true;
+        if( results[index] != expected[index])
+        {
+            std::cerr << "test case " << fileInfo.baseName().toStdString() << " failed at line " << index+1 << ":" << std::endl;
+            std::cerr << "\t expected: \"" << expected[index].toStdString() << "\"" << std::endl;
+            std::cerr << "\t produced: \"" << results[index].toStdString() << "\"" << std::endl << std::endl;
+
+            return false;
+        }
+    }
+    return true;
 }
 
 void GoldbachTester::calculationDone(long long sumCount)
@@ -102,10 +115,15 @@ void GoldbachTester::calculationDone(long long sumCount)
 
     const QVector<QString>& calculatorSums = goldbachCalculator->getAllSums();
     const QVector<QString>& expectedSums = loadLines( fileInfo );
-    if( calculatorSums != expectedSums )
+    if( ! this->compareSums(fileInfo, calculatorSums, expectedSums) )
+    {
+
         ++this->failed;
+    }
     else
+    {
         ++this->passed;
+    }
     this->calculators.remove(goldbachCalculator);
     goldbachCalculator->deleteLater();
 
