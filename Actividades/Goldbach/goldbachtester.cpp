@@ -40,7 +40,10 @@ bool GoldbachTester::testDirectory(const QString &path)
     for ( int index = 0; index < fileList.count(); ++index)
         this->testFile( fileList[index].absoluteFilePath() );
         // std::cout << "Processing file " << qPrintable( fileList[index].absoluteFilePath() ) << std::endl;
-    return fileList.count() == 0; 
+    if(fileList.count() == 0)
+        return false;
+
+    return true;
 }
 
 bool GoldbachTester::testFile(const QFileInfo& fileInfo)
@@ -56,6 +59,8 @@ bool GoldbachTester::testFile(const QFileInfo& fileInfo)
     ++this->total;
     this->connect(goldbachCalculator, &GoldbachCalculator::calculationDone, this, &GoldbachTester::calculationDone);
     goldbachCalculator->calculate(number); // eso hace que una cosa que vaya corriendo paralelo siguente. el codigo dejo de ser secuencial. y queremos los resultados, y guardarlos en un arreglo de strings.
+
+
     return true;
 }
 
@@ -74,12 +79,12 @@ QVector<QString> GoldbachTester::loadLines(const QFileInfo &fileInfo)
 
 int GoldbachTester::percentPassed() const
 {
-    return this->passed*100/this->total;
+    return qCeil((this->passed*100)/this->total);
 }
 
 int GoldbachTester::percentFailed() const
 {
-    return this->failed*100/this->total;
+    return qCeil((this->failed*100)/this->total);
 }
 
 bool GoldbachTester::compareSums(const QFileInfo &fileInfo, const QVector<QString> &results, const QVector<QString> &expected)

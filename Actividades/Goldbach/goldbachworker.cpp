@@ -14,17 +14,13 @@ GoldbachWorker::GoldbachWorker(long long number, int current, int ideal, QVector
 
 void GoldbachWorker::run()
 {
-    this->time.start();
     this->calculate(this->number);
-    double seconds = this->time.elapsed() / 1000.0;
-//    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds << " sums found: " << results << " Range: " << this->initialRange() << "-" << this->finalRange() << std::endl;
-//    std::cerr << std::endl;
     emit this->calculationDone(this->workerCurrent, this->sums.count());
 }
 
 long long GoldbachWorker::calculate(long long number)
 {
-
+    this->time.start();
     if ( number < 4 || number == 5 ) return 0;
     return number % 2 == 0 ? calculateEvenGoldbach(number) : calculateOddGoldbach(number);
 }
@@ -38,6 +34,7 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
         long long b = number - a;
         if ( b >= a && isPrime(b) )
         {
+
             this->sums.append( tr("%2 + %3").arg(a).arg(b) );
             ++results;
         }
@@ -45,7 +42,9 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
         if ( this->isInterruptionRequested() )
             return results;
     }
-
+    double seconds = this->time.elapsed() / 1000.0;
+//    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds << " sums found: " << results << " Range: " << this->initialRange() << "-" << this->finalRange() << std::endl;
+//    std::cerr << std::endl;
     return results;
 }
 
@@ -62,14 +61,20 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
             long long c = number - a - b;
             if ( c >= b && isPrime(c) )
             {
+
+                ++results;
                 this->sums.append(tr("%2 + %3 + %4").arg(a).arg(b).arg(c) );
-                ++results; 
+
             }
+
             // If user cancelled, stop calculations
             if ( this->isInterruptionRequested() )
                 return results;
         }
     }
+    double seconds = this->time.elapsed() / 1000.0;
+//    std::cerr << "Worker #" << this->workerCurrent << " time elapsed: " << seconds << " sums found: " << results << "Range: " << this->initialRange() << "-" << this->finalRange() << std::endl;
+//    std::cerr << std::endl;
     return results;
 }
 

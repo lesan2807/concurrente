@@ -19,10 +19,10 @@ void GoldbachCalculator::calculate(long long number)
     for (int current = 0; current < ideal; ++current)
     {
         GoldbachWorker* worker = new GoldbachWorker(number, current, ideal, this->results[current], this);
-        this->connect(worker, &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
-        //this->workers[current]->connect( this->workers[current], &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
-        worker->start();
         this->workers.append(worker);
+        this->connect(this->workers[current], &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
+        //this->workers[current]->connect( this->workers[current], &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
+        this->workers[current]->start();
     }
     this->lastRowFetched = 0;
     this->endResetModel();
@@ -33,12 +33,12 @@ void GoldbachCalculator::stop()
     int ideal = QThread::idealThreadCount() - 1;
     for(int current = 0; current < ideal; ++current)
     {
-        if( this->workers[current] != nullptr )
-            this->workers[current]->requestInterruption();
+        Q_ASSERT(this->workers[current]);
+        this->workers[current]->requestInterruption();
     }
 }
 
-// Method for tester: ONLY FOR TESTER 
+// Method for tester:
 QVector<QString> GoldbachCalculator::getAllSums() const
 {
     QVector<QString> allSums;
@@ -87,6 +87,9 @@ bool GoldbachCalculator::allWorkersDone()
     return false;
 }
 
+
+
+
 int GoldbachCalculator::rowCount(const QModelIndex &parent) const //interfaz no se enloquezca, cantidad que pide el usuario
 {
     Q_UNUSED(parent);
@@ -97,7 +100,7 @@ QVariant GoldbachCalculator::data(const QModelIndex &index, int role) const
 {
     // dar cuantas filas quiere
     // cada vez que se necesita una 2fila se invoca data
-    // QVector<QString> resultados = this->getAllSums(); (this is inefficient )
+    QVector<QString> resultados = this->getAllSums();
     if (!index.isValid())
            return QVariant();
 
@@ -106,7 +109,7 @@ QVariant GoldbachCalculator::data(const QModelIndex &index, int role) const
 
    if (role == Qt::DisplayRole)
    {
-       return QVariant(); 
+       return resultados[index.row()];
    }
 
    return QVariant();
