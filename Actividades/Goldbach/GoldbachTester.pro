@@ -1,4 +1,4 @@
-nemo#-------------------------------------------------
+#-------------------------------------------------
 #
 # Project created by QtCreator 2018-08-14T17:08:16
 #
@@ -8,7 +8,7 @@ QT       += core
 
 TARGET = GoldbachTester
 TEMPLATE = app
-CONFIG += console debug
+CONFIG += console 
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings

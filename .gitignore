@@ -8,3 +8,4 @@ moc*
 *.qmake
 Makefile
 *.qmake.stash
+.DS*
