@@ -19,10 +19,10 @@ void GoldbachCalculator::calculate(long long number)
     for (int current = 0; current < ideal; ++current)
     {
         GoldbachWorker* worker = new GoldbachWorker(number, current, ideal, this->results[current], this);
-        this->workers.append(worker);
         this->connect(worker, &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
         //this->workers[current]->connect( this->workers[current], &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
-        this->worker->start();
+        worker->start();
+        this->workers.append(worker);
     }
     this->lastRowFetched = 0;
     this->endResetModel();
