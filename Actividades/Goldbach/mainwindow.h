@@ -30,7 +30,7 @@ class MainWindow : public QMainWindow
      * @param number The number given by user
      */
     void startCalculation(long long number);
-    void updateProgressBar(int percent);
+
 
   private slots: // manejador de eventos
     void on_lineEditNumber_textEdited(const QString &arg1);
@@ -39,6 +39,7 @@ class MainWindow : public QMainWindow
 
   protected slots:
     void calculationDone(int index, long long sumCount);
+    void updateProgressBar(int percent);
 
 };
 

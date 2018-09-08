@@ -23,6 +23,7 @@ void GoldbachCalculator::calculate(long long number)
         GoldbachWorker* worker = new GoldbachWorker(number, current, ideal, this->results[current], this);
         this->workers.append(worker);
         this->connect(this->workers[current], &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
+        this->connect(this->workers[current], &GoldbachWorker::percent, this, &GoldbachCalculator::percent);
         //this->workers[current]->connect( this->workers[current], &GoldbachWorker::calculationDone, this, &GoldbachCalculator::workerDone);
         this->workers[current]->start();
     }
@@ -56,9 +57,9 @@ QVector<QString> GoldbachCalculator::getAllSums() const
     return allSums;
 }
 
-int GoldbachCalculator::percent()
+void GoldbachCalculator::percent(int percent)
 {
-    return 100;
+    emit updateProgressBar(percent);
 }
 
 long long GoldbachCalculator::sumsFound() const

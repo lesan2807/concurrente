@@ -22,7 +22,7 @@ class GoldbachCalculator : public QAbstractListModel
     void calculate(long long number);
     void stop();
     QVector<QString> getAllSums() const;
-    int percent();
+
     long long sumsFound() const;
     void printSums() const;
     bool allWorkersDone();
@@ -37,9 +37,11 @@ class GoldbachCalculator : public QAbstractListModel
 
   signals:
     void calculationDone(int workerNumber, long long sumCount); //avisa que ha terminado los calculos
+    void updateProgressBar(int percent);
 
   protected slots:
     void workerDone(int workerNumber, long long sumCount); // cuando termina solo 1 worker
+    void percent(int percent);
 
 };
 
