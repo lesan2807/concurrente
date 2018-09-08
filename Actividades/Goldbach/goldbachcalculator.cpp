@@ -2,6 +2,8 @@
 #include "goldbachworker.h"
 #include <iostream>
 #include <algorithm>
+#include <QtMath>
+#include <QTimer>
 
 GoldbachCalculator::GoldbachCalculator(QObject *parent)
     : QAbstractListModel(parent)
@@ -100,19 +102,29 @@ QVariant GoldbachCalculator::data(const QModelIndex &index, int role) const
 {
     // dar cuantas filas quiere
     // cada vez que se necesita una 2fila se invoca data
-    QVector<QString> resultados = this->getAllSums();
+
     if (!index.isValid())
-           return QVariant();
+        return QVariant();
 
-   if (index.row() < 0 || index.row() >= this->sumsFound())
-       return QVariant();
+    if (index.row() < 0 || index.row() >= this->sumsFound())
+        return QVariant();
 
-   if (role == Qt::DisplayRole)
-   {
-       return resultados[index.row()];
-   }
+    if (role == Qt::DisplayRole)
+    {
+        int count = 0;
+        for(int indexSums = 0; indexSums < this->results.count(); ++indexSums)
+        {
+            count+= this->results[indexSums].count();
+            if( count > index.row() )
+            {
+                QString text = QString::number( index.row()+1 );
+                int difference = qAbs(index.row()-count);
+                return QVariant(text+". "+this->results[indexSums][this->results[indexSums].count()-difference]);
+            }
+        }
+    }
 
-   return QVariant();
+    return QVariant();
 }
 
 bool GoldbachCalculator::canFetchMore(const QModelIndex &parent) const
@@ -141,6 +153,9 @@ void GoldbachCalculator::fetchMore(const QModelIndex &parent)
 void GoldbachCalculator::workerDone(int workerNumber, long long sumCount)
 {
     Q_UNUSED(sumCount);
+
+    Q_ASSERT(this->workers[workerNumber]);
+    QTimer::singleShot( 10, this->workers[workerNumber], SLOT(deleteLater()) );
     this->workers[workerNumber]->deleteLater();
     this->workers[workerNumber] = nullptr;
     //this->printSums();
