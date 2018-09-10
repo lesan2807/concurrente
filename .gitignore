@@ -9,3 +9,6 @@ moc*
 Makefile
 *.qmake.stash
 .DS*
+*.zip
+*.7z
+*.rar

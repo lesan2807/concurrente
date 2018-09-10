@@ -73,6 +73,7 @@ void MainWindow::startCalculation(long long number)
 void MainWindow::calculationDone(int index, long long sumCount)
 {
     Q_UNUSED(index);
+    this->progressBar->setValue(100);
     double seconds = this->time.elapsed() / 1000.0;
     this->ui->pushButtonStart->setEnabled(true);
     this->ui->pushButtonStop->setEnabled(false);

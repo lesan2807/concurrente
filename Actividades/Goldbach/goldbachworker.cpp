@@ -45,9 +45,15 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
     double sum = count;
     for (; a < finalRange; ++a )
     {
+        sum += count;
+        if( this->isEqual(sum, percent) )
+        {
+            sum = count;
+            emit this->percent(1);
+        }
         if ( ! isPrime(a) ) continue;
         long long b = number - a;
-        if ( b >= a && isPrime(b) )
+        if ( b >= a && isPrime((a)) && isPrime(b) )
         {
             this->sums.append( tr("%2 + %3").arg(a).arg(b) );
             ++results;
@@ -55,12 +61,6 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
         // If user cancelled, stop calculations
         if ( this->isInterruptionRequested() )
             return results;
-        sum += count;
-        if( this->isEqual(sum, percent) )
-        {
-            sum = count;
-            emit this->percent(1);
-        }
     }
     return results;
 }
@@ -82,6 +82,12 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
 
     for (; a < finalRange; ++a )
     {
+        sum += count;
+        if( this->isEqual(sum, percent) )
+        {
+            sum = count;
+            emit this->percent(1);
+        }
         if ( ! isPrime(a) ) continue;
         for ( long long b = a; b < number; ++b )
         {
@@ -97,12 +103,7 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
             if ( this->isInterruptionRequested() )
                 return results;
         }
-        sum += count;
-        if( this->isEqual(sum, percent) )
-        {
-            sum = count;
-            emit this->percent(1);
-        }
+
     }
     return results;
 }
@@ -144,6 +145,6 @@ double GoldbachWorker::onePercent(long long initial, long long final)
 
 bool GoldbachWorker::isEqual(double a, double b)
 {
-    const double dEpsilon = 0.000000001; // or some other small number
-   return qAbs(a - b) <= ( (qAbs(a) < qAbs(b) ? qAbs(b) : qAbs(a)) * dEpsilon);
+    const double dEpsilon = 0.00000000001; // or some other small number
+    return qAbs(a - b) <= ( (qAbs(a) < qAbs(b) ? qAbs(b) : qAbs(a)) * dEpsilon);
 }

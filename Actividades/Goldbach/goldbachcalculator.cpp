@@ -60,7 +60,9 @@ QVector<QString> GoldbachCalculator::getAllSums() const
 
 void GoldbachCalculator::percent(int percent)
 {
-    percentSoFar += percent;
+    this->percentSoFar += percent;
+    if( this->percentSoFar == 1 )
+        this->fetchMore(QModelIndex());
     emit updateProgressBar(this->percentSoFar);
 }
 
@@ -87,9 +89,7 @@ bool GoldbachCalculator::allWorkersDone()
         if(this->workers[index] == nullptr)
             ++count;
     }
-    if( count == this->workers.count() )
-        return true;
-    return false;
+    return count == this->workers.count();
 }
 
 int GoldbachCalculator::rowCount(const QModelIndex &parent) const //interfaz no se enloquezca, cantidad que pide el usuario
@@ -153,15 +153,16 @@ void GoldbachCalculator::fetchMore(const QModelIndex &parent)
 void GoldbachCalculator::workerDone(int workerNumber, long long sumCount)
 {
     Q_UNUSED(sumCount);
-
     Q_ASSERT(this->workers[workerNumber]);
     QTimer::singleShot( 10, this->workers[workerNumber], SLOT(deleteLater()) );
     this->workers[workerNumber]->deleteLater();
     this->workers[workerNumber] = nullptr;
     //this->printSums();
     if( this->allWorkersDone()  )
+    {
+        emit this->percent(100);
         emit this->calculationDone(workerNumber, this->sumsFound());
-
+    }
 }
 
 
