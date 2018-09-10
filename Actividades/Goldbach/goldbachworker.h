@@ -68,9 +68,11 @@ class GoldbachWorker : public QThread
      */
     static bool isPrime(long long numero);
 
-  public:
+  protected:
     long long initialRange();
     long long finalRange();
+    double onePercent(long long initial, long long final);
+    bool isEqual(double a, double b);
 };
 
 #endif // GOLDBACHWORKER_H

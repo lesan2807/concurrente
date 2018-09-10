@@ -108,7 +108,7 @@ bool GoldbachTester::compareSums(const QFileInfo &fileInfo, const QVector<QStrin
 void GoldbachTester::calculationDone(long long sumCount)
 {
     Q_UNUSED(sumCount)
-    GoldbachCalculator* goldbachCalculator = dynamic_cast<GoldbachCalculator*>( sender() );
+     GoldbachCalculator* goldbachCalculator = dynamic_cast<GoldbachCalculator*>( sender() );
     Q_ASSERT(goldbachCalculator); // tiene que ser un goldbachCalculator
 
     QFileInfo fileInfo = this->calculators.value(goldbachCalculator);

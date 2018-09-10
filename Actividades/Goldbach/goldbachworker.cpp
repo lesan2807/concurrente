@@ -33,7 +33,17 @@ long long GoldbachWorker::calculate(long long number)
 long long GoldbachWorker::calculateEvenGoldbach(long long number)
 {
     long long results = 0;
-    for ( long long a = this->initialRange(); a < this->finalRange(); ++a )
+    long long a = this->initialRange();
+    long long finalRange = this->finalRange();
+    double percent = 0.0;
+    double count = 0.0;
+    if( finalRange-a > 100)
+    {
+        percent = this->onePercent(a, finalRange);
+        count = percent/static_cast<int>(percent);
+    }
+    double sum = count;
+    for (; a < finalRange; ++a )
     {
         if ( ! isPrime(a) ) continue;
         long long b = number - a;
@@ -45,8 +55,13 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
         // If user cancelled, stop calculations
         if ( this->isInterruptionRequested() )
             return results;
+        sum += count;
+        if( this->isEqual(sum, percent) )
+        {
+            sum = count;
+            emit this->percent(1);
+        }
     }
-    emit this->percent(100);
     return results;
 }
 
@@ -54,7 +69,18 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
 {
 
     long long results = 0;
-    for ( long long a = this->initialRange(); a < this->finalRange(); ++a )
+    long long a = this->initialRange();
+    long long finalRange = this->finalRange();
+    double percent = 0.0;
+    double count = 0.0;
+    if( finalRange-a > 100)
+    {
+        percent = this->onePercent(a, finalRange);
+        count = percent/static_cast<int>(percent);
+    }
+    double sum = count;
+
+    for (; a < finalRange; ++a )
     {
         if ( ! isPrime(a) ) continue;
         for ( long long b = a; b < number; ++b )
@@ -71,8 +97,13 @@ long long GoldbachWorker::calculateOddGoldbach(long long number)
             if ( this->isInterruptionRequested() )
                 return results;
         }
+        sum += count;
+        if( this->isEqual(sum, percent) )
+        {
+            sum = count;
+            emit this->percent(1);
+        }
     }
-    emit this->percent(100);
     return results;
 }
 
@@ -103,4 +134,16 @@ long long GoldbachWorker::finalRange()
     long long division = (this->number-2)/this->workerIdeal;
     finalRange = 2 + ((this->workerCurrent+1)*division);
     return finalRange;
+}
+
+double GoldbachWorker::onePercent(long long initial, long long final)
+{
+    double range = static_cast<double>(final-initial);
+    return range/100;
+}
+
+bool GoldbachWorker::isEqual(double a, double b)
+{
+    const double dEpsilon = 0.000000001; // or some other small number
+   return qAbs(a - b) <= ( (qAbs(a) < qAbs(b) ? qAbs(b) : qAbs(a)) * dEpsilon);
 }

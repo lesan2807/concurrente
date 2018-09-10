@@ -39,6 +39,7 @@ void GoldbachCalculator::stop()
         Q_ASSERT(this->workers[current]);
         this->workers[current]->requestInterruption();
     }
+    emit this->percent(0);
 }
 
 // Method for tester:
@@ -59,7 +60,8 @@ QVector<QString> GoldbachCalculator::getAllSums() const
 
 void GoldbachCalculator::percent(int percent)
 {
-    emit updateProgressBar(percent);
+    percentSoFar += percent;
+    emit updateProgressBar(this->percentSoFar);
 }
 
 long long GoldbachCalculator::sumsFound() const
@@ -89,9 +91,6 @@ bool GoldbachCalculator::allWorkersDone()
         return true;
     return false;
 }
-
-
-
 
 int GoldbachCalculator::rowCount(const QModelIndex &parent) const //interfaz no se enloquezca, cantidad que pide el usuario
 {

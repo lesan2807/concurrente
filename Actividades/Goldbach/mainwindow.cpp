@@ -25,11 +25,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::updateProgressBar(int percent)
-{
-    this->progressBar->setValue(percent);
-}
-
 void MainWindow::on_lineEditNumber_textEdited(const QString &arg1)
 {
     (void)arg1;
@@ -40,7 +35,6 @@ void MainWindow::on_lineEditNumber_textEdited(const QString &arg1)
 
 void MainWindow::on_pushButtonStop_clicked()
 {
-
     Q_ASSERT( this->goldbachCalculator ); // checkear que tenga un thread, programación defensiva
     this->goldbachCalculator->stop();
 }
@@ -85,3 +79,7 @@ void MainWindow::calculationDone(int index, long long sumCount)
     this->ui->statusBar->showMessage(tr("%1 sums found in %2 seconds").arg(sumCount).arg(seconds));
 }
 
+void MainWindow::updateProgressBar(int percent)
+{
+    this->progressBar->setValue(percent);
+}

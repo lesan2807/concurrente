@@ -16,6 +16,7 @@ class GoldbachCalculator : public QAbstractListModel
     int lastRowFetched = 0;
     int countRows = 0;
     QVector<QVector<QString>> results;
+    int percentSoFar = 0;
 
   public:
     explicit GoldbachCalculator(QObject *parent = nullptr);
