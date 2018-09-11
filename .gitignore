@@ -12,3 +12,4 @@ Makefile
 *.zip
 *.7z
 *.rar
+*.~lock.
