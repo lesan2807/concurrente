@@ -43,7 +43,7 @@ long long GoldbachWorker::calculateEvenGoldbach(long long number)
         count = percent/static_cast<int>(percent);
     }
     double sum = count;
-    for (; a < finalRange; ++a )
+    for (;  a < finalRange; ++a )
     {
         sum += count;
         if( this->isEqual(sum, percent) )
