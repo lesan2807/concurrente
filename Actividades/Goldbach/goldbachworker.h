@@ -66,7 +66,7 @@ class GoldbachWorker : public QThread
      * Retorna true si numero es primo, false si numero no es primo o menor que 2
      * Por definicion 1 no es primo ni compuesto, este metodo retorna false
      */
-    static bool isPrime(long long numero);
+    static bool isPrime(long long n);
 
   protected:
     long long initialRange();
