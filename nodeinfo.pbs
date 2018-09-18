@@ -1,0 +1,26 @@
+# Portable Batch System (PBS) file
+# Configuracion de la cola de ejecucion
+# Un PBS es un archivo de configuracion de un administrador de cola
+
+# Como se llamaran los archivos de salida
+#PBS -N nodeinfo
+
+# A cual cola quiero que lo envie, pedir 2 nodos por 72 horas
+#PBS -q phi-n2h72 
+
+# Deme dos nodos (o menos que los de arriba) y 1 proceso por nodo
+# Si esta linea se quita, utiliza el maximo de recursos indicados en la anterior
+# Pero el administrador puede no hacer la mejor distribucion
+#PBS -l nodes=2:ppn=1
+
+# Limite de ejecucion, si no termina en 1min mate el programa
+#PBS -l walltime=0:1:00
+
+# Cuando se llama qsub se crea esta variable donde se envio el trabajo
+cd $PBS_O_WORKDIR
+
+# Cargar los comandos de MPI para Python
+module load gcc/7.2.0
+
+# Corra el programa con la configuracion anterior
+mpiexec ./nodeinfo.sh
