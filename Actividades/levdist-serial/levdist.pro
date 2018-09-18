@@ -8,7 +8,8 @@ HEADERS += \
 	concurrency.h \
 	dir.h \
     queue.h \
-    levdist.h
+    levdist.h \
+    levenshtein.h
 
 SOURCES += \
 	arguments.c \
@@ -16,4 +17,6 @@ SOURCES += \
 	dir.c \
 	main.c \
     queue.c \
-    levdist.c
+    levdist.c \
+    levenshtein.c\
+
