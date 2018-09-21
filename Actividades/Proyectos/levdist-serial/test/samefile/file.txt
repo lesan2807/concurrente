@@ -1,0 +1,2 @@
+It makes no sense to compare a file against itself.
+We already know the result and we do not want to waste computer resources.
