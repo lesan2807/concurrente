@@ -11,7 +11,8 @@ https://en.wikipedia.org/wiki/Levenshtein_distance
 
 This program compares files stored in directories using the Levenshtein Distance. It lists the files from most similar to less similar.
 For example, in a directory called camel_snake there are 4 files. One contains  "whatIsFasterToRead", the second one contains "what_is_fasterToRead", the third one contains "WHAT_IS_FASTER_TO_READ" and the last one contains "what_is_faster_to_read".  
-The program will then produce this output:  
+The program will then produce this output:
+
 4	files/camel.txt	files/camel_snake.txt  
 4	files/camel_snake.txt	files/snake.txt  
 8	files/camel.txt	files/snake.txt  
@@ -61,8 +62,6 @@ The testing done for this program is black box testing.
 For more information: http://softwaretestingfundamentals.com/black-box-testing/
 
 In order to test the program with the case files provided, you have to run the command "make test". This will install the program cdiff, if you do not have it installed. It will then compare the expected output with the one produced by the program. And it will also compare the expected error with the produced error.
-<Explain how to run the automated tests>
-
 
 ## Author:
 
@@ -71,7 +70,7 @@ lesan2807@gmail.com
 This is part of a course's assignment in order to study serial vs. parallel programming.
 
 This program is protected under the MIT license.
-Copyright <YEAR> <COPYRIGHT HOLDER>
+Copyright 2018.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
