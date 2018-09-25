@@ -36,11 +36,11 @@ Options:
   -r, --recursive  Analyze files in subdirectories  
   -w W             Use W workers (threads)  
 
-If you write ./levdist files --help it will show how to use the command.  
-If you write ./levdist -q -r files it will not print the elapsed time and it will search recursively in all the subdirectories for the files.
-You can also write the files you want to analyze: ./levdist -q file1.txt file2.txt file3.txt. This also will not print the elapsed time.  
-If you write ./levdist files -q -r -w 16, the program is run with 16 workers (threads).
-If you write ./levdist -Q -r -files, there will no be output generated.  
+If you write bin/./levdist files --help it will show how to use the command.  
+If you write bin/./levdist -q -r files it will not print the elapsed time and it will search recursively in all the subdirectories for the files.
+You can also write the files you want to analyze: bin/./levdist -q file1.txt file2.txt file3.txt. This also will not print the elapsed time.  
+If you write bin/./levdist files -q -r -w 16, the program is run with 16 workers (threads).
+If you write bin/./levdist -Q -r -files, there will no be output generated.  
 
 ## Building
 
