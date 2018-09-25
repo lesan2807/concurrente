@@ -53,12 +53,14 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
 	this->files = queue_create();
 	levdist_list_files_in_args(this, argc, argv);
 
-	// Print filenames found
-	levdist_print_files(this);
+	// Print filenames found when -Q is not provied as an argument.
+	if( !this->arguments.silent )
+		levdist_print_files(this);
 	queue_destroy(this->files, true);
 
-	// Report elapsed time
-	printf("Elapsed %.9lfs with %d workers\n", walltime_elapsed(&start), this->arguments.workers);
+	// Report elapsed time when -q is not written on arguments.
+	if( !this->arguments.quiet )
+		printf("Elapsed %.9lfs with %d workers\n", walltime_elapsed(&start), this->arguments.workers);
 
 	return 0;
 }
