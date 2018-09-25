@@ -10,15 +10,15 @@ For more information on how the algorithm is implemented: https://people.cs.pitt
 https://en.wikipedia.org/wiki/Levenshtein_distance
 
 This program compares files stored in directories using the Levenshtein Distance. It lists the files from most similar to less similar.
-For example, in a directory called camel_snake there are 4 files. One contains  "whatIsFasterToRead", the second one contains "what_is_fasterToRead", the third one contains "WHAT_IS_FASTER_TO_READ" and the last one contains "what_is_faster_to_read".  
-The program will then produce this output:
 
-4	files/camel.txt	files/camel_snake.txt  
-4	files/camel_snake.txt	files/snake.txt  
-8	files/camel.txt	files/snake.txt  
-18	files/camel.txt	files/const.txt  
-18	files/camel_snake.txt	files/const.txt  
-18	files/const.txt	files/snake.txt  
+For example, in a directory called camel_snake there are 4 files. One contains  "whatIsFasterToRead", the second one contains "what_is_fasterToRead", the third one contains "WHAT_IS_FASTER_TO_READ" and the last one contains "what_is_faster_to_read".  
+The program will then produce this output:<br />
+4	files/camel.txt	files/camel_snake.txt<br />
+4	files/camel_snake.txt	files/snake.txt<br />
+8	files/camel.txt	files/snake.txt<br />
+18	files/camel.txt	files/const.txt<br />
+18	files/camel_snake.txt	files/const.txt<br />
+18	files/const.txt	files/snake.txt<br />
 
 The Levenshtein Distance algorithm is used for:
 * Spell cheking
@@ -27,20 +27,20 @@ The Levenshtein Distance algorithm is used for:
 
 ## User manual
 
-Usage: levdist [-qr][-w W] DIRS|FILES  
-Finds most similar files using Levenshtein distance  
-Options:  
-      --help       Prints this help  
-      --version    Prints information about this command  
-  -q, --quiet      Do not print elapsed time (e.g: for testing)  
-  -Q, --silent     Do not generate output at all (for testing)  
-  -r, --recursive  Analyze files in subdirectories  
-  -w W             Use W workers (threads)  
+Usage: levdist [-qr][-w W] DIRS|FILES<br />
+Finds most similar files using Levenshtein distance<br />
+Options:<br />
+      --help       Prints this help<br />
+      --version    Prints information about this command<br />
+  -q, --quiet      Do not print elapsed time (e.g: for testing)<br />
+  -Q, --silent     Do not generate output at all (for testing)<br />
+  -r, --recursive  Analyze files in subdirectories<br />
+  -w W             Use W workers (threads)
 
-If you write bin/./levdist files --help it will show how to use the command.  
-If you write bin/./levdist -q -r files it will not print the elapsed time and it will search recursively in all the subdirectories for the files.
-You can also write the files you want to analyze: bin/./levdist -q file1.txt file2.txt file3.txt. This also will not print the elapsed time.  
-If you write bin/./levdist files -q -r -w 16, the program is run with 16 workers (threads).
+If you write bin/./levdist files --help it will show how to use the command.<br />
+If you write bin/./levdist -q -r files it will not print the elapsed time and it will search recursively in all the subdirectories for the files.<br />
+You can also write the files you want to analyze: bin/./levdist -q file1.txt file2.txt file3.txt. This also will not print the elapsed time.<br />
+If you write bin/./levdist files -q -r -w 16, the program is run with 16 workers (threads).<br />
 If you write bin/./levdist -Q -r -files, there will no be output generated.  
 
 ## Building
@@ -50,23 +50,23 @@ Requisites:
 1. A POSIX Unix operating system
 2. A GCC-compatible compiler
 
-To build the levdist program run the command "make". This will build the program on debug mode.   
-In order to remove the build files run the command "make clean".   
-To build the levdist program in release mode run the command "make release".   
-In order to install the levdist program run the command "make install". This will add the program to the bin folder of the operative system. This allows you to run your program outside of the project folder. If it has not been built, this command will build levdist in release mode.  
+To build the levdist program run the command "make". This will build the program on debug mode.<br />
+In order to remove the build files run the command "make clean".<br />
+To build the levdist program in release mode run the command "make release".<br />
+In order to install the levdist program run the command "make install". This will add the program to the bin folder of the operative system. This allows you to run your program outside of the project folder. If it has not been built, this command will build levdist in release mode.<br />
 In order to uninstall the levdist program run the command "make uninstall".  
 
 ## Testing
 
-The testing done for this program is black box testing.  
+The testing done for this program is black box testing.<br />
 For more information: http://softwaretestingfundamentals.com/black-box-testing/
 
 In order to test the program with the case files provided, you have to run the command "make test". This will install the program cdiff, if you do not have it installed. It will then compare the expected output with the one produced by the program. And it will also compare the expected error with the produced error.
 
 ## Author:
 
-Lucía Elizondo   
-lesan2807@gmail.com  
+Lucía Elizondo<br />
+lesan2807@gmail.com<br />
 This is part of a course's assignment in order to study serial vs. parallel programming.
 
 This program is protected under the MIT license.
