@@ -20,6 +20,10 @@ typedef struct
 	bool recursive;
 	/// Number of workers (threads) to use
 	int workers;
+	/// True if output does not print elapsed time
+	bool quiet;
+	/// True if does not generate output at all
+	bool silent; 
 } arguments_t;
 
 /**

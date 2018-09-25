@@ -15,13 +15,15 @@ arguments_t* arguments_init(arguments_t* arguments)
 	arguments->dir_count = 0;
 	arguments->recursive = false;
 	arguments->workers = concurrency_cpu_count();
+	arguments->quiet = false;
+	arguments->silent = false;
 
 	return arguments;
 }
 
 int arguments_print_version()
 {
-	printf("levdist v1.3 [2018-sep-17] AUTHOR1 <EMAIL1>, AUTHOR2 <EMAIL2>\n");
+	printf("levdist v1.3 [2018-sep-17] Lucia Elizondo, lesan2807@gmail.com\n");
 	printf("This is free software with no warranties. Use it at your own risk.\n");
 
 	return 0;
@@ -64,6 +66,11 @@ arguments_t arguments_analyze(int argc, char* argv[])
 					arguments.version_asked = true;
 				if ( strcmp(arg, "--recursive") == 0 )
 					arguments.recursive = true;
+				if ( strcmp(arg, "--quiet") == 0 )
+					arguments.quiet = true;
+				if ( strcmp(arg, "--silent") == 0 )
+					arguments.silent = true;
+
 			}
 			else
 			{
@@ -94,6 +101,9 @@ arguments_t arguments_analyze(int argc, char* argv[])
 							arguments.error = 3;
 						}
 						break;
+					case 'q': arguments.quiet = true; break;
+					case 'Q': arguments.silent = true; break;
+
 
 					// Unknown option
 					default:
