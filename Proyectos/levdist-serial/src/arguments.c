@@ -116,7 +116,7 @@ arguments_t arguments_analyze(int argc, char* argv[])
 		}
 		else
 		{
-			// It is not an option, assume a directory
+			// It is not an option, assume a directory or file
 			++arguments.dir_count;
 		}
 	}

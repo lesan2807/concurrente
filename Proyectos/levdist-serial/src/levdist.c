@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
 
 #include "concurrency.h"
 #include "dir.h"
@@ -37,9 +39,9 @@ int levdist_run(levdist_t* this, int argc, char* argv[])
 
 	// If user did not provided directories, stop
 	if ( this->arguments.dir_count <= 0 )
-		return fprintf(stderr, "levdist: error: no directories given\n"), 1;
+		return fprintf(stderr, "levdist: error: no directories or files given\n"), 1;
 
-	// Arguments seems fine, process the directories
+	// Arguments seem fine, process the directories or files 
 	return levdist_process_dirs(this, argc, argv);
 }
 
@@ -53,8 +55,8 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
 	this->files = queue_create();
 	levdist_list_files_in_args(this, argc, argv);
 
-	// Print filenames found when -Q is not provied as an argument.
-	if( !this->arguments.silent )
+	// Print filenames found when -Q nor -q are not provied as an argument.
+	if( !this->arguments.silent && !this->arguments.quiet)
 		levdist_print_files(this);
 	queue_destroy(this->files, true);
 
@@ -67,6 +69,7 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
 
 int levdist_list_files_in_args(levdist_t* this, int argc, char* argv[])
 {
+	struct stat file_info;
 	// Traverse all arguments
 	for ( int current = 1; current < argc; ++current )
 	{
@@ -74,8 +77,15 @@ int levdist_list_files_in_args(levdist_t* this, int argc, char* argv[])
 		const char* arg = argv[current];
 		if ( *arg == '-' )
 			continue;
-
-		dir_list_files_in_dir(this->files, arg, this->arguments.recursive);
+		stat( arg, &file_info);
+		if( S_ISDIR(file_info.st_mode) )
+		{
+			dir_list_files_in_dir(this->files, arg, this->arguments.recursive);
+		}
+		else
+		{
+			queue_append(this->files, strdup(arg));
+		}
 	}
 
 	return 0;

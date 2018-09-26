@@ -23,7 +23,7 @@ typedef struct
 	/// True if output does not print elapsed time
 	bool quiet;
 	/// True if does not generate output at all
-	bool silent; 
+	bool silent;
 } arguments_t;
 
 /**
