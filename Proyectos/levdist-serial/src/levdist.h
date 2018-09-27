@@ -21,6 +21,7 @@ int main(int argc, char* argv[])
 */
 
 #include "arguments.h"
+#include "levenshtein.h"
 #include "queue.h"
 
 
@@ -33,6 +34,8 @@ typedef struct
 	arguments_t arguments;
 	/// Queue of files to be compared using Levenshtein distance.
 	queue_t* files;
+	/// Array of comparisons found using Levenshtein distance.
+    lev_dist_files_t* distances;
 } levdist_t;
 
 
@@ -77,5 +80,14 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[]);
 	@return The exit status, where 0 stands for success, otherwise for an error.
 */
 int levdist_list_files_in_args(levdist_t* this, int argc, char* argv[]);
+
+/**
+    @brief Initializes the array with the files needed.
+
+    @param this Pointer to the @a levdist_t structure to fill array.
+    @param queue Pointer to the queue that has the files.
+*/
+void distances_init(levdist_t* this, queue_t* queue);
+
 
 #endif // LEVDIST_H

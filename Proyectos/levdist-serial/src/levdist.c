@@ -6,6 +6,7 @@
 #include "concurrency.h"
 #include "dir.h"
 #include "levdist.h"
+#include "levenshtein.h"
 
 // Private functions:
 
@@ -19,7 +20,7 @@ void levdist_print_files(levdist_t* this);
 void levdist_init(levdist_t* this)
 {
 	arguments_init(&this->arguments);
-	this->files = NULL;
+    this->files = NULL;
 }
 
 int levdist_run(levdist_t* this, int argc, char* argv[])
@@ -41,7 +42,7 @@ int levdist_run(levdist_t* this, int argc, char* argv[])
 	if ( this->arguments.dir_count <= 0 )
 		return fprintf(stderr, "levdist: error: no directories or files given\n"), 1;
 
-	// Arguments seem fine, process the directories or files 
+	// Arguments seem fine, process the directories or files
 	return levdist_process_dirs(this, argc, argv);
 }
 
@@ -55,15 +56,38 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
 	this->files = queue_create();
 	levdist_list_files_in_args(this, argc, argv);
 
+    size_t comparisons = queue_count(this->files)*(queue_count(this->files)-1)/2;
+    // fprintf(stderr, "comparisons: %zu\n", comparisons);
+    if( comparisons == 0)
+    {
+        queue_destroy(this->files, true);
+        return fprintf(stderr, "levdist: error: at least two files are required to compare\n"), 2;
+    }
+    // Create the array
+    this->distances = malloc(comparisons*sizeof(lev_dist_files_t));
+
+
+
+    // Fill the array of records for each file
+    distances_init(this, this->files);
+    // Calculate levenshtein distance for all files.
+
+    // Order array
+
+    // Print if -Q not an argument
+
 	// Print filenames found when -Q nor -q are not provied as an argument.
 	if( !this->arguments.silent && !this->arguments.quiet)
-		levdist_print_files(this);
-	queue_destroy(this->files, true);
+        levdist_print_files(this);
+
+    //array_destroy
+    free(this->distances);
 
 	// Report elapsed time when -q is not written on arguments.
 	if( !this->arguments.quiet )
 		printf("Elapsed %.9lfs with %d workers\n", walltime_elapsed(&start), this->arguments.workers);
 
+    queue_destroy(this->files, true);
 	return 0;
 }
 
@@ -87,7 +111,6 @@ int levdist_list_files_in_args(levdist_t* this, int argc, char* argv[])
 			queue_append(this->files, strdup(arg));
 		}
 	}
-
 	return 0;
 }
 
@@ -110,4 +133,20 @@ void levdist_print_files(levdist_t* this)
 		const char* filename = (const char*)queue_data(itr);
 		printf("%ld: %s\n", ++count, filename);
 	}
+}
+
+void distances_init(levdist_t* this, queue_t* queue)
+{
+    lev_dist_files_t file_info;
+    size_t index = 0;
+    for(queue_iterator_t itr_source = queue_begin(queue); itr_source != queue_end(queue); itr_source = queue_next(itr_source))
+    {
+        file_info.file_source = (const char*)queue_data(itr_source);
+        for(queue_iterator_t itr_target = queue_next(itr_source); itr_target != queue_end(queue); itr_target = queue_next(itr_target))
+        {
+            file_info.file_target = (const char*)queue_data(itr_target);
+            this->distances[index] = file_info;
+            ++index;
+        }
+    }
 }

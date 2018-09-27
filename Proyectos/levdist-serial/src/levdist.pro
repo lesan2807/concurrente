@@ -9,6 +9,7 @@ HEADERS += \
 	dir.h \
 	levdist.h \
 	queue.h \
+        levenshtein.h \
 
 SOURCES += \
 	arguments.c \
@@ -17,3 +18,4 @@ SOURCES += \
 	levdist.c \
 	main.c \
 	queue.c \
+        levenshtein.c \
