@@ -16,6 +16,8 @@ void levdist_print_and_destroy_files(levdist_t* this);
 /// Shows how to traverse the list without removing elements
 void levdist_print_files(levdist_t* this);
 
+/// Makes sure that files are different
+int levdist_check_different_files(queue_t* queue);
 
 void levdist_init(levdist_t* this)
 {
@@ -56,9 +58,13 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
 	this->files = queue_create();
 	levdist_list_files_in_args(this, argc, argv);
 
+
+
+    // How many comparisons need to be done. (Gauss formula)
     size_t comparisons = queue_count(this->files)*(queue_count(this->files)-1)/2;
-    // fprintf(stderr, "comparisons: %zu\n", comparisons);
-    if( comparisons == 0)
+
+    // If only one file:
+    if( comparisons == 0 || levdist_check_different_files(this->files))
     {
         queue_destroy(this->files, true);
         return fprintf(stderr, "levdist: error: at least two files are required to compare\n"), 2;
@@ -66,11 +72,10 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
     // Create the array
     this->distances = malloc(comparisons*sizeof(lev_dist_files_t));
 
-
-
     // Fill the array of records for each file
     distances_init(this, this->files);
     // Calculate levenshtein distance for all files.
+    lev_dist_calculate_files(this->distances, comparisons);
 
     // Order array
 
@@ -133,6 +138,22 @@ void levdist_print_files(levdist_t* this)
 		const char* filename = (const char*)queue_data(itr);
 		printf("%ld: %s\n", ++count, filename);
 	}
+}
+
+int levdist_check_different_files(queue_t* queue)
+{
+    int different = 0;
+    for(queue_iterator_t itr_source = queue_begin(queue); itr_source != queue_end(queue); itr_source = queue_next(itr_source))
+    {
+        const char* file_source = (const char*)queue_data(itr_source);
+        for(queue_iterator_t itr_target = queue_next(itr_source); itr_target != queue_end(queue); itr_target = queue_next(itr_target))
+        {
+            const char* file_target = (const char*)queue_data(itr_target);
+            if( strcmp(file_source, file_target) == 0)
+                different = 1;
+        }
+    }
+    return different;
 }
 
 void distances_init(levdist_t* this, queue_t* queue)
