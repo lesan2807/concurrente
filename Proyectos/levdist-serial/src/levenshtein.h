@@ -1,6 +1,7 @@
 #ifndef LEVENSHTEIN_H
 #define LEVENSHTEIN_H
 
+#include <stddef.h>
 
 /** @file levenshtein.h
 
@@ -15,7 +16,7 @@ An opaque record that contains attributes for calculating the levenshtein distan
 /// A record that stores the Levensthein distance between two files
 typedef struct{
     /// Levenshtein distance
-    int distance;
+    size_t distance;
     /// Name of source file
     const char* file_source;
     /// Name of target file
@@ -24,13 +25,23 @@ typedef struct{
 
 /**
   @brief Calculate levenshtein distance between two strings.
-  \ref https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C
+  https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C
 
   @param source Source string.
   @param target Target string.
-  @return Integer of the distance found between two strings.
+  @return Unsigned long long of the distance found between two strings.
 */
-int levenshtein(const char* source, const char* target);
+size_t levenshtein(const char* source, const char* target);
+
+/**
+  @brief Calculates levenshtein distance for all the files.
+  Uses the method to calculate the levenstein distance between two strings.
+
+  @param distances Array of records that have the distance, the name of the source file and the name of the target file.
+  @param comparisons Number of comparisons needed, also size of array.
+  @return Integer: for error handling.
+ */
+int lev_dist_calculate_files(lev_dist_files_t* distances, size_t comparisons);
 
 
 #endif // LEVENSHTEIN_H
