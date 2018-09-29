@@ -2,6 +2,7 @@
 #define LEVENSHTEIN_H
 
 #include <stddef.h>
+#include "queue.h"
 
 /** @file levenshtein.h
 
@@ -44,4 +45,19 @@ size_t levenshtein(const char* source, const char* target);
 int lev_dist_calculate_files(lev_dist_files_t* distances, size_t comparisons);
 
 
+/**
+    @brief Initializes the array with the files needed.
+    Fills each struct with distance in 0 and both files needed to compare.
+
+    @param this Pointer to the lev_dist_files structure array.
+    @param queue Pointer to the queue that has the files.
+*/
+void distances_init(lev_dist_files_t* files, queue_t* queue);
+
+int less_than_distance(const void* first, const void* second);
+void order_files(lev_dist_files_t *one);
+int less_than_files_source(const void* first, const void* second);
+int less_than_files_target(const void* first, const void* second);
+
 #endif // LEVENSHTEIN_H
+

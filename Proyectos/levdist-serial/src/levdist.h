@@ -81,13 +81,7 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[]);
 */
 int levdist_list_files_in_args(levdist_t* this, int argc, char* argv[]);
 
-/**
-    @brief Initializes the array with the files needed.
 
-    @param this Pointer to the @a levdist_t structure to fill array.
-    @param queue Pointer to the queue that has the files.
-*/
-void distances_init(levdist_t* this, queue_t* queue);
 
 
 #endif // LEVDIST_H

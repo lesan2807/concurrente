@@ -6,6 +6,9 @@
 
 #include "levenshtein.h"
 
+
+
+
 // Choose the minimum of three numbers
 #define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
 
@@ -72,11 +75,69 @@ int lev_dist_calculate_files(lev_dist_files_t* distances, size_t comparisons)
         target[file_info_target.st_size] = '\0';
 
         distances[index].distance = levenshtein(source, target);
-        fprintf(stderr, "distance callculated:%zu \n", distances[index].distance);
         free(source);
         free(target);
         fclose(source_file);
         fclose(target_file);
     }
+    return 0;
+}
+
+void distances_init(lev_dist_files_t* files, queue_t* queue)
+{
+    lev_dist_files_t file_info;
+    size_t index = 0;
+    for(queue_iterator_t itr_source = queue_begin(queue); itr_source != queue_end(queue); itr_source = queue_next(itr_source))
+    {
+        file_info.file_source = (const char*)queue_data(itr_source);
+        for(queue_iterator_t itr_target = queue_next(itr_source); itr_target != queue_end(queue); itr_target = queue_next(itr_target))
+        {
+            file_info.file_target = (const char*)queue_data(itr_target);
+            files[index] = file_info;
+            ++index;
+        }
+    }
+}
+
+int less_than_distance(const void* first, const void* second)
+{
+    lev_dist_files_t one = *(lev_dist_files_t*)first;
+    lev_dist_files_t two = *(lev_dist_files_t*)second;
+    if ( one.distance <  two.distance ) return -1;
+    if ( one.distance ==  two.distance ) return 0;
+    if ( one.distance >  two.distance ) return 1;
+    return 0;
+}
+
+
+
+void order_files(lev_dist_files_t* one)
+{
+    //int size = strlen(one.file_source) > strlen(one.file_target) ? strlen(one.file_source) : strlen(one.file_target);
+    if( strcmp( one->file_source, one->file_target) > 0)
+    {
+        const char* temp = one->file_source;
+        one->file_source = one->file_target;
+        one->file_target = temp;
+    }
+}
+
+int less_than_files_source(const void *first, const void *second)
+{
+    lev_dist_files_t one = *(lev_dist_files_t*)first;
+    lev_dist_files_t two = *(lev_dist_files_t*)second;
+    if ( strcmp(one.file_source, two.file_source) < 0 ) return -1;
+    if ( strcmp(one.file_source, two.file_source) == 0 ) return 0;
+    if ( strcmp(one.file_source, two.file_source) > 0 ) return 1;
+    return 0;
+}
+
+int less_than_files_target(const void *first, const void *second)
+{
+    lev_dist_files_t one = *(lev_dist_files_t*)first;
+    lev_dist_files_t two = *(lev_dist_files_t*)second;
+    if ( strcmp(one.file_target, two.file_target) < 0 ) return -1;
+    if ( strcmp(one.file_target, two.file_target) == 0 ) return 0;
+    if ( strcmp(one.file_target, two.file_target) > 0 ) return 1;
     return 0;
 }

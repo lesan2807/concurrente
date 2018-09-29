@@ -19,6 +19,10 @@ void levdist_print_files(levdist_t* this);
 /// Makes sure that files are different
 int levdist_check_different_files(queue_t* queue);
 
+void levdist_print_distances(lev_dist_files_t* distances, size_t comparisons);
+
+void order(lev_dist_files_t* distances, size_t comparisons);
+
 void levdist_init(levdist_t* this)
 {
 	arguments_init(&this->arguments);
@@ -58,8 +62,6 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
 	this->files = queue_create();
 	levdist_list_files_in_args(this, argc, argv);
 
-
-
     // How many comparisons need to be done. (Gauss formula)
     size_t comparisons = queue_count(this->files)*(queue_count(this->files)-1)/2;
 
@@ -73,17 +75,26 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
     this->distances = malloc(comparisons*sizeof(lev_dist_files_t));
 
     // Fill the array of records for each file
-    distances_init(this, this->files);
+    distances_init(this->distances, this->files);
     // Calculate levenshtein distance for all files.
     lev_dist_calculate_files(this->distances, comparisons);
 
-    // Order array
+    // Order array by distances
+    // radixsort(this->distances, comparisons);
+    // seleccion(this->distances, comparisons);
+    order(this->distances, comparisons);
+    qsort(this->distances, comparisons, sizeof(lev_dist_files_t), less_than_files_target);
+    qsort(this->distances, comparisons, sizeof(lev_dist_files_t), less_than_files_source);
+    qsort(this->distances, comparisons, sizeof(lev_dist_files_t), less_than_distance);
 
-    // Print if -Q not an argument
 
-	// Print filenames found when -Q nor -q are not provied as an argument.
-	if( !this->arguments.silent && !this->arguments.quiet)
-        levdist_print_files(this);
+    // Print filenames found when -Q is provided as an argument.
+    if( !this->arguments.silent)
+    {
+        // fprintf(stderr, "comparisons: %zu\n", comparisons);
+        // levdist_print_files(this);
+        levdist_print_distances(this->distances, comparisons);
+    }
 
     //array_destroy
     free(this->distances);
@@ -140,6 +151,14 @@ void levdist_print_files(levdist_t* this)
 	}
 }
 
+void levdist_print_distances(lev_dist_files_t* distances, size_t comparisons)
+{
+    for(size_t index = 0; index < comparisons; ++index)
+    {
+        printf("%zu\t%s\t%s\n", distances[index].distance, distances[index].file_source, distances[index].file_target);
+    }
+}
+
 int levdist_check_different_files(queue_t* queue)
 {
     int different = 0;
@@ -156,18 +175,10 @@ int levdist_check_different_files(queue_t* queue)
     return different;
 }
 
-void distances_init(levdist_t* this, queue_t* queue)
+void order(lev_dist_files_t* distances, size_t comparisons)
 {
-    lev_dist_files_t file_info;
-    size_t index = 0;
-    for(queue_iterator_t itr_source = queue_begin(queue); itr_source != queue_end(queue); itr_source = queue_next(itr_source))
-    {
-        file_info.file_source = (const char*)queue_data(itr_source);
-        for(queue_iterator_t itr_target = queue_next(itr_source); itr_target != queue_end(queue); itr_target = queue_next(itr_target))
-        {
-            file_info.file_target = (const char*)queue_data(itr_target);
-            this->distances[index] = file_info;
-            ++index;
-        }
-    }
+    for(size_t index = 0; index < comparisons; ++index)
+        order_files(&distances[index]);
 }
+
+
