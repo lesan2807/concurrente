@@ -24,6 +24,8 @@ typedef struct
 	bool quiet;
 	/// True if does not generate output at all
 	bool silent;
+    /// True if there are unicode files
+    bool unicode;
 } arguments_t;
 
 /**

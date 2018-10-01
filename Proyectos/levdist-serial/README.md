@@ -35,13 +35,15 @@ Options:<br />
   -q, --quiet      Do not print elapsed time (e.g: for testing)<br />
   -Q, --silent     Do not generate output at all (for testing)<br />
   -r, --recursive  Analyze files in subdirectories<br />
-  -w W             Use W workers (threads)
+  -w W             Use W workers (threads)<br />
+  -u,              Use unicode encoding
 
 If you write bin/./levdist files --help it will show how to use the command.<br />
 If you write bin/./levdist -q -r files it will not print the elapsed time and it will search recursively in all the subdirectories for the files.<br />
 You can also write the files you want to analyze: bin/./levdist -q file1.txt file2.txt file3.txt. This also will not print the elapsed time.<br />
 If you write bin/./levdist files -q -r -w 16, the program is run with 16 workers (threads).<br />
-If you write bin/./levdist -Q -r -files, there will no be output generated.  
+If you write bin/./levdist -Q -r files, there will no be output generated.  
+If you write bin/./levdist -q -r -u files, the files will be read using unicode.
 
 ## Building
 

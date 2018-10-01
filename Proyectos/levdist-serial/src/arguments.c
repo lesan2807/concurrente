@@ -17,6 +17,7 @@ arguments_t* arguments_init(arguments_t* arguments)
 	arguments->workers = concurrency_cpu_count();
 	arguments->quiet = false;
 	arguments->silent = false;
+    arguments->unicode = false;
 
 	return arguments;
 }
@@ -31,7 +32,7 @@ int arguments_print_version()
 
 int arguments_print_usage()
 {
-	printf("Usage: levdist [-qr][-w W] DIRS|FILES\n");
+    printf("Usage: levdist [-qru][-w W] DIRS|FILES\n");
 	printf("Finds most similar files using Levenshtein distance\n");
 	printf("\n");
 	printf("Options:\n");
@@ -41,6 +42,7 @@ int arguments_print_usage()
 	printf("  -Q, --silent     Do not generate output at all (for testing)\n");
 	printf("  -r, --recursive  Analyze files in subdirectories\n");
 	printf("  -w W             Use W workers (threads)\n");
+    printf("  -u,              Use unicode encoding\n");
 
 	return 0;
 }
@@ -102,7 +104,8 @@ arguments_t arguments_analyze(int argc, char* argv[])
 						}
 						break;
 					case 'q': arguments.quiet = true; break;
-					case 'Q': arguments.silent = true; break;
+                    case 'Q': arguments.silent = true; break;
+                    case 'u': arguments.unicode = true; break;
 
 
 					// Unknown option

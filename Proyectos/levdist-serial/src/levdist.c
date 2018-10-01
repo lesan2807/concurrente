@@ -69,7 +69,9 @@ int levdist_run(levdist_t* this, int argc, char* argv[])
 
 int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
 {
-    setlocale(LC_ALL, "");
+    // If -u is an argument, set locale
+    if( this->arguments.unicode )
+        setlocale(LC_ALL, "");
 	// Start counting the time
 	walltime_t start;
 	walltime_start(&start);
@@ -93,7 +95,10 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
     // Fill the array of records for each file
     distances_init(this);
     // Calculate levenshtein distance for all files.
-    lev_dist_calculate_files_ascii(this->distances, comparisons);
+    if( this->arguments.unicode )
+        lev_dist_calculate_files_unicode(this->distances, comparisons);
+    else
+        lev_dist_calculate_files_ascii(this->distances, comparisons);
 
     // Order array
     levdist_order_lev_dist_t(this->distances, comparisons);
