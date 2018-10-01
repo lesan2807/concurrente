@@ -84,7 +84,7 @@ int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t compariso
         if( source_file == NULL)
             return fprintf(stderr, "levdist: error: could not open file: %s", distances[index].file_source), 1;
         target_file = fopen( distances[index].file_target, "rb" );
-        if( source_file == NULL)
+        if( target_file == NULL)
             return fprintf(stderr, "levdist: error: could not open file: %s", distances[index].file_target), 2;
         stat( distances[index].file_source, &file_info_source);
         stat( distances[index].file_target, &file_info_target);
@@ -124,7 +124,7 @@ int lev_dist_calculate_files_unicode(lev_dist_files_t *distances, size_t compari
         if( source_file == NULL)
             return fprintf(stderr, "levdist: error: could not open file: %s", distances[index].file_source), 1;
         target_file = fopen( distances[index].file_target, "rb" );
-        if( source_file == NULL)
+        if( target_file == NULL)
             return fprintf(stderr, "levdist: error: could not open file: %s", distances[index].file_target), 2;
         stat( distances[index].file_source, &file_info_source);
         stat( distances[index].file_target, &file_info_target);
