@@ -24,40 +24,50 @@ typedef struct{
     const char* file_target;
 } lev_dist_files_t;
 
+
 /**
-  @brief Calculate levenshtein distance between two strings.
+  @brief Calculate levenshtein distance between two strings only ASCII.
   https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C
 
   @param source Source string.
   @param target Target string.
   @return Unsigned long long of the distance found between two strings.
 */
-size_t levenshtein(const char* source, const char* target);
+size_t levenshtein_ascii(const char* source, const char* target);
+
+
+/**
+  @brief Calculate levenshtein distance between two strings only ASCII.
+  https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C
+
+  @param source Source string.
+  @param target Target string.
+  @return Unsigned long long of the distance found between two strings.
+*/
+size_t levenshtein_unicode(const wchar_t* source, const wchar_t* target);
+
 
 /**
   @brief Calculates levenshtein distance for all the files.
-  Uses the method to calculate the levenstein distance between two strings.
+  Uses the method to calculate the levenstein distance between two strings only ACII.
 
   @param distances Array of records that have the distance, the name of the source file and the name of the target file.
   @param comparisons Number of comparisons needed, also size of array.
   @return Integer: for error handling.
  */
-int lev_dist_calculate_files(lev_dist_files_t* distances, size_t comparisons);
+int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons);
 
 
 /**
-    @brief Initializes the array with the files needed.
-    Fills each struct with distance in 0 and both files needed to compare.
+  @brief Calculates levenshtein distance for all the files.
+  Uses the method to calculate the levenstein distance between two strings with Unicode.
 
-    @param this Pointer to the lev_dist_files structure array.
-    @param queue Pointer to the queue that has the files.
-*/
-void distances_init(lev_dist_files_t* files, queue_t* queue);
+  @param distances Array of records that have the distance, the name of the source file and the name of the target file.
+  @param comparisons Number of comparisons needed, also size of array.
+  @return Integer: for error handling.
+ */
+int lev_dist_calculate_files_unicode(lev_dist_files_t* distances, size_t comparisons);
 
-int less_than_distance(const void* first, const void* second);
-void order_files(lev_dist_files_t *one);
-int less_than_files_source(const void* first, const void* second);
-int less_than_files_target(const void* first, const void* second);
 
 #endif // LEVENSHTEIN_H
 

@@ -82,6 +82,13 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[]);
 int levdist_list_files_in_args(levdist_t* this, int argc, char* argv[]);
 
 
+/**
+    @brief Initializes the array with the files needed.
+    Fills each struct with distance in 0 and both files needed to compare.
+
+    @param this Pointer to the @a levdist_t structure with the shared attibutes.
+*/
+void distances_init(levdist_t* this);
 
 
 #endif // LEVDIST_H
