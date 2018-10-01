@@ -71,7 +71,9 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
 {
     // If -u is an argument, set locale
     if( this->arguments.unicode )
+    {
         setlocale(LC_ALL, "");
+    }
 	// Start counting the time
 	walltime_t start;
 	walltime_start(&start);

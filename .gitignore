@@ -6,7 +6,6 @@ build-*
 *.autosave
 moc*
 *.qmake
-Makefile
 *.qmake.stash
 .DS*
 *.zip
