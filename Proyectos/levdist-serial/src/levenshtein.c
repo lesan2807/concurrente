@@ -44,7 +44,7 @@
 
 size_t levenshtein_ascii(const char* source, const char* target) {
     size_t source_length, target_length, x, y, lastdiag, olddiag;
-    source_length = strlen(source);|
+    source_length = strlen(source);
     target_length = strlen(target);
     size_t* column = malloc((source_length+1)*sizeof(size_t));
     for (y = 1; y <= source_length; ++y)
@@ -93,7 +93,7 @@ size_t levenshtein_ascii(const char* source, const char* target) {
 
 size_t levenshtein_unicode(const wchar_t* source, const wchar_t* target) {
     size_t source_length, target_length, x, y, lastdiag, olddiag;
-    source_length = wcslen(source);|
+    source_length = wcslen(source);
     target_length = wcslen(target);
     size_t* column = malloc((source_length+1)*sizeof(size_t));
     for (y = 1; y <= source_length; ++y)
