@@ -1,0 +1,6 @@
+4	files/camel.txt	files/camel_snake.txt
+4	files/camel_snake.txt	files/snake.txt
+8	files/camel.txt	files/snake.txt
+18	files/camel.txt	files/const.txt
+18	files/camel_snake.txt	files/const.txt
+18	files/const.txt	files/snake.txt
