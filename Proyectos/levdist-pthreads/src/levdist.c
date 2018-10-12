@@ -75,8 +75,9 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
         setlocale(LC_ALL, "");
     }
 	// Start counting the time
-	walltime_t start;
-	walltime_start(&start);
+	walltime_t start_total;
+	walltime_t start_comparisons;
+	walltime_start(&start_total);
 
 	// Load all files into a list
 	this->files = queue_create();
@@ -96,6 +97,8 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
 
     // Fill the array of records for each file
     distances_init(this);
+
+	walltime_start(&start_comparisons);
     // Calculate levenshtein distance for all files.
     if( this->arguments.unicode )
         lev_dist_calculate_files_unicode(this->distances, comparisons);
@@ -122,7 +125,7 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
 
 	// Report elapsed time when -q is not written on arguments.
 	if( !this->arguments.quiet )
-		printf("Elapsed %.9lfs with %d workers\n", walltime_elapsed(&start), this->arguments.workers);
+		printf("Total time %.9lfs, comparing time %.9lfs, with %d workers\n", walltime_elapsed(&start_total), walltime_elapsed(&start_comparisons), this->arguments.workers);
 
     queue_destroy(this->files, true);
 	return 0;
