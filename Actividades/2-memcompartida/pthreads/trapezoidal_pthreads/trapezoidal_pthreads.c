@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define MIN(x,y) ((x<y)?x:y)
+
 typedef struct
 {
   size_t my_number_threads;
@@ -62,6 +64,9 @@ int main(int argc, char* argv[])
 
     pthread_t threads[number_threads];
     thread_info_t* info = calloc(number_threads, sizeof(thread_info_t));
+
+    if(number_threads > n)
+        number_threads = MIN(number_threads, n); 
     double sum = 0.0;
     sum +=  f(a) + f(a+n*delta_x);
 
@@ -76,7 +81,6 @@ int main(int argc, char* argv[])
         info[index].my_final_range = final_range(n, number_threads, index);
         info[index].my_sum = 0.0;
         pthread_create(&threads[index], NULL, trapezoidal_rule, (void*)&info[index]);
-
     }
 
     for(size_t index = 0; index < number_threads; ++index)
