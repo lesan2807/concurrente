@@ -12,7 +12,7 @@ typedef struct
 	size_t* current_step;
 	const size_t* max_steps;
 	size_t* numbers;
-	sem_t* sempahores;
+	pthread_barrier_t* barrier;
 
 }thread_info_t;
 
@@ -38,14 +38,15 @@ void* calculate(void* data)
 		else if( my_info->numbers[my_info->id] != 1)
 			calcul = my_info->numbers[my_info->id] * my_info->numbers[my_info->prev] + my_info->numbers[my_info->next];
 
-		sem_wait(&my_info->sempahores[my_info->id]); 
+		pthread_barrier_wait(my_info->barrier); 
 		my_info->numbers[my_info->id] = calcul;
-		sem_post(&my_info->sempahores[(my_info->id +1) % my_info->size_numbers]);
+		pthread_barrier_wait(my_info->barrier);
 		
 		if (my_info->id == 0)
 			++*(my_info->current_step);
 		else
 			calcul = 1;
+		
 	}
 	return NULL;
 }
@@ -60,14 +61,8 @@ int main()
 	size_t* numbers_array = calloc( number_count,  sizeof(size_t));
 	for ( size_t index = 0; index < number_count; ++index )
 		scanf("%zu", &numbers_array[index]);
-
-	sem_t semaphore[worker_count]; 
-	sem_init(&semaphore[0], 0, 1);
-	for(size_t index = 1; index	< worker_count; ++index)
-	{
-		sem_init(&semaphore[index],	0,	0);
-	}
-	
+	pthread_barrier_t barriers; 
+	pthread_barrier_init(&barriers, NULL, (unsigned)worker_count);
 
 	pthread_t threads[worker_count];
 	thread_info_t* info = calloc(worker_count, sizeof(thread_info_t));
@@ -80,7 +75,7 @@ int main()
 		info[index].current_step = &current;
 		info[index].max_steps = &max;
 		info[index].numbers = numbers_array;
-		info[index].sempahores = semaphore;
+		info[index].barrier = &barriers; 
 		pthread_create(&threads[index], NULL, calculate, (void*)&info[index]);
 	}
 
