@@ -33,19 +33,7 @@ typedef struct{
   @param target Target string.
   @return Unsigned long long of the distance found between two strings.
 */
-size_t levenshtein_ascii(const char* source, const char* target);
-
-
-/**
-  @brief Calculate levenshtein distance between two strings only ASCII.
-  https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#C
-
-  @param source Source string.
-  @param target Target string.
-  @return Unsigned long long of the distance found between two strings.
-*/
-size_t levenshtein_unicode(const wchar_t* source, const wchar_t* target);
-
+size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t number_threads);
 
 /**
   @brief Calculates levenshtein distance for all the files.
@@ -55,8 +43,14 @@ size_t levenshtein_unicode(const wchar_t* source, const wchar_t* target);
   @param comparisons Number of comparisons needed, also size of array.
   @return Integer: for error handling.
  */
-int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons);
+int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons, size_t number_threads);
 
+/**
+  @brief Opens file for comparison
+  @param path is the path to open
+  */
+
+unsigned char* levenshtein_load_file(const char *path);
 
 /**
   @brief Calculates levenshtein distance for all the files.
