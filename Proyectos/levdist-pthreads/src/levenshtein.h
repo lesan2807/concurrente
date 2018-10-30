@@ -2,6 +2,7 @@
 #define LEVENSHTEIN_H
 
 #include <stddef.h>
+#include <pthread.h>
 #include "queue.h"
 
 /** @file levenshtein.h
@@ -24,6 +25,36 @@ typedef struct{
     const char* file_target;
 } lev_dist_files_t;
 
+/**
+An opaque record that contains attributes for calculating the matrix X of the parallel algorithm.
+*/
+typedef struct
+{
+    unsigned int initial_row;
+    unsigned int final_row;
+    unsigned int** matrix_x;
+    unsigned char* target;
+    unsigned char* alphabet;
+    size_t* columnas;
+}thread_info_matrix_t;
+
+/**
+An opaque record that contains attributes for calculating the matrix D of the parallel algorithm.
+*/
+typedef struct
+{
+    size_t id;
+    size_t initial_col;
+    size_t final_col;
+    unsigned int** matrix_x;
+    unsigned int** matrix_d;
+    size_t* distance_row;
+    size_t* columnas;
+    unsigned char* source;
+    unsigned char* target;
+    int* alphabet;
+    pthread_barrier_t* barrier;
+}thread_info_levdist_t;
 
 /**
   @brief Calculate levenshtein distance between two strings only ASCII.
