@@ -52,7 +52,7 @@ typedef struct
     size_t* columnas;
     unsigned char* source;
     unsigned char* target;
-    int* alphabet;
+    unsigned char* alphabet;
     pthread_barrier_t* barrier;
 }thread_info_levdist_t;
 
@@ -64,7 +64,7 @@ typedef struct
   @param target Target string.
   @return Unsigned long long of the distance found between two strings.
 */
-size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t number_threads);
+size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t number_threads, size_t source_size, size_t target_size);
 
 /**
   @brief Calculates levenshtein distance for all the files.
@@ -81,7 +81,7 @@ int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t compariso
   @param path is the path to open
   */
 
-unsigned char* levenshtein_load_file(const char *path);
+unsigned char* levenshtein_load_file(const char *path, size_t *size);
 
 /**
   @brief Calculates levenshtein distance for all the files.

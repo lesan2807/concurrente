@@ -1,15 +1,16 @@
 #include <assert.h>
 #include <pthread.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdlib.h>
+#include <string.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <unistd.h>
 #include <wchar.h>
 #include <wctype.h>
+
 
 #include "levenshtein.h"
 
@@ -53,7 +54,7 @@ void* fill_matrix(void* data)
     for(unsigned int fila = info->initial_row; fila < info->final_row; ++fila)
     {
         info->matrix_x[fila][0] = 0;
-        for(size_t columna = 1; columna < *info->columnas+1; ++columna)
+        for(size_t columna = 1; columna < *(info->columnas)+1; ++columna)
         {
 
             if( info->target[columna-1] == info->alphabet[fila])
@@ -72,41 +73,70 @@ void* calculate_levdist(void* data)
     thread_info_levdist_t* info = (thread_info_levdist_t*)data;
     for(size_t matrix_row = 0; matrix_row < *info->distance_row; ++matrix_row)
     {
+        int current = matrix_row % 2;
+        int prev = (matrix_row - 1) % 2;
         for(size_t column = info->initial_col; column < info->final_col; ++column)
         {
             if( matrix_row == 0)
-                info->matrix_d[matrix_row % 2][column] = column;
+            {
+                info->matrix_d[current][column] = column;
+                printf("r1 ");
+
+            }
             else if( column == 0)
-                info->matrix_d[matrix_row % 2][column] = matrix_row;
+            {
+                info->matrix_d[current][column] = matrix_row;
+                printf("r2 ");
+            }
             else if( info->target[matrix_row - 1] == info->source[matrix_row - 1])
-                info->matrix_d[matrix_row % 2][column] = info->matrix_d[(matrix_row - 1) % 2][column - 1];
+            {
+                printf("r3 ");
+                info->matrix_d[current][column] = info->matrix_d[prev][column - 1];
+            }
             else if( info->matrix_x[info->source[matrix_row - 1]][column] == 0)
-                info->matrix_d[matrix_row % 2][column] = 1 +
-                        MIN3(info->matrix_d[(matrix_row -1 ) % 2][column - 1],
-                        info->matrix_d[(matrix_row -1 ) % 2][column],
+            {
+                printf("r4 ");
+                info->matrix_d[current][column] = 1 +
+                        MIN3(info->matrix_d[prev][column - 1],
+                        info->matrix_d[prev][column],
                         matrix_row+column-1);
+            }
             else
             {
-                if( column != info->initial_col)
-                    info->matrix_d[matrix_row % 2][column] = MIN3(info->matrix_d[(matrix_row -1 )% 2][column] + 1,
-                            info->matrix_d[matrix_row % 2][column - 1] + 1,
-                            info->matrix_d[(matrix_row - 1) % 2][column - 1] + (info->source[column - 1] == info->target[(matrix_row-1) % 2] ? 0 : 1));
-                else
-                    info->matrix_d[matrix_row % 2][column] = 1 +
-                            MIN3(info->matrix_d[(matrix_row - 1) % 2][column],
-                            info->matrix_d[(matrix_row - 1) % 2][column-1],
-                            info->matrix_d[(matrix_row - 1) % 2][info->matrix_x[info->source[matrix_row-1]][column]]
-                            + column - 1 - info->matrix_x[info->source[matrix_row-1]][column]);
+
+//                if( column != info->initial_col)
+//                {
+//                    info->matrix_d[current][column] = MIN3(
+//                                info->matrix_d[prev][column],
+//                                info->matrix_d[current][column - 1],
+//                                info->matrix_d[prev][column - 1]);
+//                    ++(info->matrix_d[current][column]);
+//                    printf("op ");
+//                }
+//                else
+                {
+
+                    info->matrix_d[current][column] =
+                            MIN3(
+                                info->matrix_d[prev][column],
+                                info->matrix_d[prev][column-1],
+                                info->matrix_d[prev][info->matrix_x[info->source[matrix_row-1]][column] - 1]
+                                + column - 1 - info->matrix_x[info->source[matrix_row-1]][column]);
+                    ++info->matrix_d[current][column];
+                    printf("ow ");
+                }
             }
+            printf("(%u)  ", info->matrix_d[current][column]);
         }
         pthread_barrier_wait(info->barrier);
+        printf("\n");
     }
 
 
     return NULL;
 }
 
-size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t number_threads)
+size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t number_threads, size_t source_size, size_t target_size)
 {
     pthread_t threads_matrix[number_threads];
     thread_info_matrix_t* info_matrix = calloc(number_threads, sizeof(thread_info_matrix_t));
@@ -116,16 +146,16 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
     size_t columns = 1;
     assert(source);
     assert(target);
-    if( strlen((const char*)source) > strlen((const char*)target) )
+    if( source_size > target_size )
     {
-        columns = strlen((const char*)source);
+        columns = source_size;
         unsigned char* temp = source;
         source = target;
         target = temp;
     }
     else
     {
-        columns = strlen((const char*)target);
+        columns = target_size;
     }
     size_t rows = 256;
     unsigned int** matrix = (unsigned int**)malloc(rows * sizeof(unsigned int*));
@@ -162,7 +192,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
             return printf("oups"), 1;
     }
 
-    size_t actual_row = strlen((char*)source);
+    size_t actual_row = source_size;
 
     pthread_t threads_levdist[number_threads];
     thread_info_levdist_t* info_levdist = calloc(number_threads, sizeof(thread_info_levdist_t));
@@ -195,10 +225,19 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
     for ( size_t row_index = 0; row_index < rows; ++row_index )
         free(matrix[row_index]);
     free(matrix);
-    return matrix_lev[(actual_row - 1)  % 2][columns-1];
+
+    unsigned int distance = matrix_lev[(actual_row - 1) % 2][columns];
+
+    for ( size_t row_index = 0; row_index < 2; ++row_index )
+        free(matrix_lev[row_index]);
+    free(matrix_lev);
+
+
+
+    return distance;
 }
 
-unsigned char* levenshtein_load_file(const char *path)
+unsigned char* levenshtein_load_file(const char *path, size_t * size)
 {
     assert(path);
     unsigned char* buffer = NULL;
@@ -208,6 +247,7 @@ unsigned char* levenshtein_load_file(const char *path)
     {
         fseek( file, 0, SEEK_END);
         length = ftell(file);
+        *size = length;
         fseek( file, 0, SEEK_SET);
         buffer = (unsigned char*)malloc(length+1);
         if(buffer)
@@ -225,11 +265,12 @@ int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t compariso
 {
     unsigned char* source = NULL;
     unsigned char* target = NULL;
+    size_t source_size, target_size;
     for(size_t index = 0; index < comparisons; ++index)
     {
-        source = levenshtein_load_file(distances[index].file_source);
-        target = levenshtein_load_file(distances[index].file_target);;
-        distances[index].distance = levenshtein_ascii(source, target, number_threads);
+        source = levenshtein_load_file(distances[index].file_source, &source_size);
+        target = levenshtein_load_file(distances[index].file_target, &target_size);;
+        distances[index].distance = levenshtein_ascii(source, target, number_threads, source_size, target_size);
         assert(source);
         assert(target);
         free(source);

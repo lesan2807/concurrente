@@ -3,6 +3,9 @@ QT -= core
 CONFIG += console
 CONFIG -= qt app_bundle
 
+QMAKE += -pthread
+LIBS += -pthread
+
 HEADERS += \
 	arguments.h \
 	concurrency.h \
