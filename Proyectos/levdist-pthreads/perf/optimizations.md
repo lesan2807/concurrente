@@ -24,3 +24,7 @@ Cache miss is a state where the data requested for processing by a component or 
 (https://www.techopedia.com/definition/6308/cache-miss).
 
 With the levdist program, in order to calculate the distance of a cell, you need to have calculated previous information and use the minimum of them all. This could potentially make the program fetch the data from other cache levels or the main memory thus creating cache misses.
+
+### Design 
+We can see how this algorithm works with the next image: 
+![](levdistrun.png)
