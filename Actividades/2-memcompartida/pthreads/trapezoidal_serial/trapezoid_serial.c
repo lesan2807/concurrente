@@ -4,7 +4,8 @@
 
 double f(double x)
 {
-    return cos(x)*2*x + x/8;
+    //return cos(x)*2*x + x/8;
+    return x; 
 }
 
 // https://en.wikipedia.org/wiki/Trapezoidal_rule
