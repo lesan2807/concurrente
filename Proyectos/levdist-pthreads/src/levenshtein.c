@@ -165,7 +165,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
     {
         columns = target_size;
     }
-    printf("pattern: %zu text:%zu\n", source_size, target_size);
+    //printf("pattern: %zu text:%zu\n", source_size, target_size);
     size_t rows = 256;
     unsigned int** matrix = (unsigned int**)calloc(rows , 1+sizeof(unsigned int*));
     if(matrix == NULL)
