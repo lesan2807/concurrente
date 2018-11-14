@@ -7,6 +7,7 @@
 #include <string.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <wchar.h>
 #include <wctype.h>
@@ -53,11 +54,13 @@ void* fill_matrix(void* data)
     thread_info_matrix_t* info = (thread_info_matrix_t*)data;
     for(unsigned int fila = info->initial_row; fila < info->final_row; ++fila)
     {
-        info->matrix_x[fila][0] = 0;
-        for(size_t columna = 1; columna < *(info->columnas)+1; ++columna)
+        for(size_t columna = 0; columna < *(info->columnas)+1; ++columna)
         {
-
-            if( info->target[columna-1] == info->alphabet[fila])
+            if( columna == 0)
+            {
+                info->matrix_x[fila][columna] = 0;
+            }
+            else if( info->target[columna-1] == info->alphabet[fila])
             {
                 info->matrix_x[fila][columna] = columna;
             }
@@ -80,22 +83,22 @@ void* calculate_levdist(void* data)
             if( matrix_row == 0)
             {
                 info->matrix_d[current][column] = column;
-                printf("r1 ");
+               // printf("r1 ");
 
             }
             else if( column == 0)
             {
                 info->matrix_d[current][column] = matrix_row;
-                printf("r2 ");
+                //printf("r2 ");
             }
             else if( info->target[matrix_row - 1] == info->source[matrix_row - 1])
             {
-                printf("r3 ");
+                //printf("r3 ");
                 info->matrix_d[current][column] = info->matrix_d[prev][column - 1];
             }
             else if( info->matrix_x[info->source[matrix_row - 1]][column] == 0)
             {
-                printf("r4 ");
+                //printf("r4 ");
                 info->matrix_d[current][column] = 1 +
                         MIN3(info->matrix_d[prev][column - 1],
                         info->matrix_d[prev][column],
@@ -123,13 +126,13 @@ void* calculate_levdist(void* data)
                                 info->matrix_d[prev][info->matrix_x[info->source[matrix_row-1]][column] - 1]
                                 + column - 1 - info->matrix_x[info->source[matrix_row-1]][column]);
                     ++info->matrix_d[current][column];
-                    printf("ow ");
+                    //printf("ow ");
                 }
             }
-            printf("(%u)  ", info->matrix_d[current][column]);
+            // printf("(%u)  ", info->matrix_d[current][column]);
         }
         pthread_barrier_wait(info->barrier);
-        printf("\n");
+        // printf("\n");
     }
 
 
@@ -138,6 +141,8 @@ void* calculate_levdist(void* data)
 
 size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t number_threads, size_t source_size, size_t target_size)
 {
+    unsigned char* pattern = source;
+    unsigned char* text = target;
     pthread_t threads_matrix[number_threads];
     thread_info_matrix_t* info_matrix = calloc(number_threads, sizeof(thread_info_matrix_t));
     unsigned char ascii[256];
@@ -148,15 +153,19 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
     assert(target);
     if( source_size > target_size )
     {
+        unsigned char* temp = pattern;
+        pattern = text;
+        text = temp;
+        size_t temp_size = source_size;
+        target_size = source_size;
+        source_size = temp_size;
         columns = source_size;
-        unsigned char* temp = source;
-        source = target;
-        target = temp;
     }
     else
     {
         columns = target_size;
     }
+    printf("pattern: %zu text:%zu\n", source_size, target_size);
     size_t rows = 256;
     unsigned int** matrix = (unsigned int**)malloc(rows * sizeof(unsigned int*));
     if(matrix == NULL)
@@ -207,8 +216,8 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
         info_levdist[index].matrix_d = matrix_lev;
         info_levdist[index].distance_row = &actual_row;
         info_levdist[index].columnas = &columns;
-        info_levdist[index].source = source;
-        info_levdist[index].target = target;
+        info_levdist[index].source = pattern;
+        info_levdist[index].target = text;
         info_levdist[index].alphabet = ascii;
         info_levdist[index].barrier = &barriers;
         pthread_create(&threads_levdist[index], NULL, calculate_levdist, (void*)&info_levdist[index]);
@@ -226,56 +235,77 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
         free(matrix[row_index]);
     free(matrix);
 
-    unsigned int distance = matrix_lev[(actual_row - 1) % 2][columns];
+    unsigned int distance = matrix_lev[(actual_row-1) % 2][columns];
 
     for ( size_t row_index = 0; row_index < 2; ++row_index )
         free(matrix_lev[row_index]);
     free(matrix_lev);
-
-
-
-    return distance;
+    //printf("distance:%u\n", distance-1);
+    return distance-1;
 }
 
-unsigned char* levenshtein_load_file(const char *path, size_t * size)
-{
-    assert(path);
-    unsigned char* buffer = NULL;
-    size_t length = 0;
-    FILE* file = fopen(path, "rb");
-    if(file)
-    {
-        fseek( file, 0, SEEK_END);
-        length = ftell(file);
-        *size = length;
-        fseek( file, 0, SEEK_SET);
-        buffer = (unsigned char*)malloc(length+1);
-        if(buffer)
-        {
-            fread(buffer, 1, length, file);
-            buffer[length] = '\0';
-        }
-        fclose(file);
-    }
-    assert(buffer);
-    return buffer;
-}
+//unsigned char* levenshtein_load_file(const char *path, size_t * size)
+//{
+//    assert(path);
+//    unsigned char* buffer = NULL;
+//    size_t length = 0;
+//    FILE* file = fopen(path, "rb");
+//    if(file)
+//    {
+//        fseek( file, 0, SEEK_END);
+//        length = ftell(file);
+//        *size = length;
+//        fseek( file, 0, SEEK_SET);
+//        buffer = (unsigned char*)malloc(length+1);
+//        if(buffer)
+//        {
+//            fread(buffer, 1, length, file);
+//            buffer[length] = '\0';
+//        }
+//        fclose(file);
+//    }
+//    assert(buffer);
+//    return buffer;
+//}
 
 int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons, size_t number_threads)
 {
-    unsigned char* source = NULL;
-    unsigned char* target = NULL;
-    size_t source_size, target_size;
     for(size_t index = 0; index < comparisons; ++index)
-    {
-        source = levenshtein_load_file(distances[index].file_source, &source_size);
-        target = levenshtein_load_file(distances[index].file_target, &target_size);;
-        distances[index].distance = levenshtein_ascii(source, target, number_threads, source_size, target_size);
-        assert(source);
-        assert(target);
-        free(source);
-        free(target);
-    }
+        {
+            FILE* source_file;
+            FILE* target_file;
+            unsigned char* source = NULL;
+            unsigned char* target = NULL;
+            struct stat file_info_source;
+            struct stat file_info_target;
+            // open files
+            source_file = fopen( distances[index].file_source, "rb" );
+            if( source_file == NULL)
+                return fprintf(stderr, "levdist: error: could not open file: %s", distances[index].file_source), 1;
+            target_file = fopen( distances[index].file_target, "rb" );
+            if( target_file == NULL)
+                return fprintf(stderr, "levdist: error: could not open file: %s", distances[index].file_target), 2;
+            stat( distances[index].file_source, &file_info_source);
+            stat( distances[index].file_target, &file_info_target);
+
+            // allocate memory to contain the whole file;
+            source = (unsigned char*) calloc(sizeof(unsigned char), (size_t)file_info_source.st_size+1);
+            target = (unsigned char*) calloc(sizeof(unsigned char), (size_t)file_info_target.st_size+1);
+            if(source == NULL || target == NULL)
+                return fprintf(stderr, "levdist: error: could not allocate memory"), 3;
+
+            fread( source, 1, (size_t)file_info_source.st_size, source_file);
+            fread( target, 1, (size_t)file_info_target.st_size, target_file);
+            source[file_info_source.st_size] = '\0';
+            target[file_info_target.st_size] = '\0';
+            // printf("1:%zu 2:%zu \n\n" ,strlen((char*)source), strlen((char*)target));
+
+            distances[index].distance = levenshtein_ascii(source, target, number_threads, (size_t)file_info_source.st_size, (size_t)file_info_target.st_size);
+            free(source);
+            free(target);
+            fclose(source_file);
+            fclose(target_file);
+        }
     return 0;
 }
 
