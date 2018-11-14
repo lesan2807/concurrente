@@ -167,12 +167,12 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
     }
     printf("pattern: %zu text:%zu\n", source_size, target_size);
     size_t rows = 256;
-    unsigned int** matrix = (unsigned int**)malloc(rows * sizeof(unsigned int*));
+    unsigned int** matrix = (unsigned int**)calloc(rows , 1+sizeof(unsigned int*));
     if(matrix == NULL)
         return printf("oups"), 1;
     for ( size_t row_index = 0; row_index < rows; ++row_index )
     {
-        matrix[row_index] = (unsigned int*)malloc((columns+1) * sizeof(unsigned int));
+        matrix[row_index] = (unsigned int*)calloc((columns+1) , sizeof(unsigned int));
         if(matrix[row_index] == NULL)
             return printf("oups"), 1;
     }
@@ -191,12 +191,12 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
     for(size_t index = 0; index < number_threads; ++index)
         pthread_join(threads_matrix[index], NULL);
 
-    unsigned int** matrix_lev = (unsigned int**)malloc( 2 * sizeof(unsigned int*));
+    unsigned int** matrix_lev = (unsigned int**)calloc( 2 , 1+sizeof(unsigned int*));
     if( matrix_lev == NULL)
         return printf("oups"), 1;
     for( size_t row_index = 0; row_index < 2; ++row_index )
     {
-        matrix_lev[row_index] = (unsigned int*)malloc((columns+1) * sizeof( unsigned int));
+        matrix_lev[row_index] = (unsigned int*)calloc((columns+1) , sizeof( unsigned int));
         if(matrix_lev[row_index] == NULL)
             return printf("oups"), 1;
     }
