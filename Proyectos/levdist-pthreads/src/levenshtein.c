@@ -41,7 +41,7 @@ void* calculate_levenshtein(void* data)
     thread_info_levdist_t* info = (thread_info_levdist_t*)data;
     for(size_t fila = info->initial_row_x; fila < info->final_row_x; ++fila)
     {
-        for(size_t columna = 0; columna < *(info->columnas)+1; ++columna)
+        for(size_t columna = 0; columna < *(info->columnas); ++columna)
         {
             if( columna == 0)
             {
@@ -59,7 +59,7 @@ void* calculate_levenshtein(void* data)
     for(size_t matrix_row = 0; matrix_row < *info->distance_row; ++matrix_row)
         {
             size_t current = matrix_row % 2;
-            size_t prev = (matrix_row - 1) % 2;
+            size_t prev = (matrix_row + 1) % 2;
             for(size_t column = info->initial_col_d; column < info->final_col_d; ++column)
             {
                 if( matrix_row == 0)
@@ -123,26 +123,29 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
 {
     unsigned char* pattern = source;
     unsigned char* text = target;
+    size_t len_pattern = strlen((char*)pattern);
+    size_t len_text = strlen((char*)text);
+    size_t distance = 0;
     size_t columns = 1;
     assert(source);
     assert(target);
-    if( source_size > target_size )
+    if( len_pattern > len_text )
     {
         unsigned char* temp = pattern;
         pattern = text;
         text = temp;
-        size_t temp_size = source_size;
-        target_size = source_size;
-        source_size = temp_size;
-        columns = source_size;
+        size_t temp_size = len_pattern;
+        len_pattern = len_text;
+        len_text = temp_size;
+        columns = len_pattern;
     }
     else
     {
-        columns = target_size;
+        columns = len_text;
     }
     //printf("pattern: %zu text:%zu\n", source_size, target_size);
     size_t rows = 256;
-    size_t** matrix = (size_t**)calloc(rows , 1+sizeof(size_t*));
+    size_t** matrix = (size_t**)calloc(rows , sizeof(size_t*));
     if(matrix == NULL)
         return printf("oups"), 1;
     for ( size_t row_index = 0; row_index < rows; ++row_index )
@@ -152,7 +155,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
             return printf("oups"), 1;
     }
 
-    size_t** matrix_lev = (size_t**)calloc( 2 , 1+sizeof(size_t*));
+    size_t** matrix_lev = (size_t**)calloc( 2 , sizeof(size_t*));
     if( matrix_lev == NULL)
         return printf("oups"), 1;
     for( size_t row_index = 0; row_index < 2; ++row_index )
@@ -188,20 +191,36 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
     for(size_t index = 0; index < number_threads; ++index)
         pthread_join(threads_levdist[index], NULL);
 
-    //debug_print_matrix(matrix_lev, 2, strlen((unsigned char*)target));
+    distance = matrix_lev[(actual_row-1) % 2][columns];
+
+
+//    for(size_t index = 0; index < 256; ++index)
+//    {
+//        printf("%c", (char)index);
+//        for(size_t col = 0; col < columns+1; ++col)
+//        {
+//            printf("[%ld]", matrix[index][col]);
+//        }
+//        printf("\n");
+//    }
+
+//    for(size_t index = 0; index < 2; ++index)
+//    {
+//        for(size_t col = 0; col < columns; ++col)
+//        {
+//            printf("[%ld]", matrix_lev[index][col]);
+//        }
+//        printf("\n");
+//    }
 
     free(info_levdist);
-
     for ( size_t row_index = 0; row_index < rows; ++row_index )
         free(matrix[row_index]);
     free(matrix);
-
-    size_t distance = matrix_lev[(actual_row-1) % 2][columns];
-
     for ( size_t row_index = 0; row_index < 2; ++row_index )
         free(matrix_lev[row_index]);
     free(matrix_lev);
-    //printf("distance:%u\n", distance-1);
+
     return distance-1;
 }
 
