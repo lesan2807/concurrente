@@ -26,33 +26,21 @@ typedef struct{
 } lev_dist_files_t;
 
 /**
-An opaque record that contains attributes for calculating the matrix X of the parallel algorithm.
-*/
-typedef struct
-{
-    unsigned int initial_row;
-    unsigned int final_row;
-    unsigned int** matrix_x;
-    unsigned char* target;
-    unsigned char* alphabet;
-    size_t* columnas;
-}thread_info_matrix_t;
-
-/**
 An opaque record that contains attributes for calculating the matrix D of the parallel algorithm.
 */
 typedef struct
 {
+    size_t initial_row_x;
+    size_t final_row_x;
+    size_t** matrix_x;
     size_t id;
-    size_t initial_col;
-    size_t final_col;
-    unsigned int** matrix_x;
-    unsigned int** matrix_d;
+    size_t initial_col_d;
+    size_t final_col_d;
+    size_t** matrix_d;
     size_t* distance_row;
     size_t* columnas;
     unsigned char* source;
     unsigned char* target;
-    unsigned char* alphabet;
     pthread_barrier_t* barrier;
 }thread_info_levdist_t;
 
@@ -74,7 +62,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
   @param comparisons Number of comparisons needed, also size of array.
   @return Integer: for error handling.
  */
-int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons, size_t number_threads);
+size_t lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons, size_t number_threads);
 
 /**
   @brief Opens file for comparison
@@ -94,5 +82,5 @@ unsigned char* levenshtein_load_file(const char *path, size_t *size);
 int lev_dist_calculate_files_unicode(lev_dist_files_t* distances, size_t comparisons);
 
 
-#endif // LEVENSHTEIN_H
+#endif // LEVENSHTEIN_DISTANCE_H
 
