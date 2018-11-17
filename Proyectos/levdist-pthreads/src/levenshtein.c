@@ -115,6 +115,8 @@ void* calculate_levenshtein(void* data)
 
 size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t number_threads, size_t source_size, size_t target_size)
 {
+    (void)source_size;
+    (void)target_size;
     unsigned char* pattern = source;
     unsigned char* text = target;
     size_t len_pattern = strlen((char*)pattern);
@@ -139,7 +141,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
     }
     //printf("pattern: %zu text:%zu\n", source_size, target_size);
     size_t rows = 256;
-    size_t** matrix = (size_t**)calloc(rows , 1+sizeof(size_t*));
+    size_t** matrix = (size_t**)calloc(rows , sizeof(size_t*));
     if(matrix == NULL)
         return printf("oups"), 1;
     for ( size_t row_index = 0; row_index < rows; ++row_index )
@@ -149,7 +151,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
             return printf("oups"), 1;
     }
 
-    size_t** matrix_lev = (size_t**)calloc( 2 , 1+sizeof(size_t*));
+    size_t** matrix_lev = (size_t**)calloc( 2 , sizeof(size_t*));
     if( matrix_lev == NULL)
         return printf("oups"), 1;
     for( size_t row_index = 0; row_index < 2; ++row_index )
