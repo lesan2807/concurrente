@@ -41,7 +41,7 @@ void* calculate_levenshtein(void* data)
     thread_info_levdist_t* info = (thread_info_levdist_t*)data;
     for(size_t fila = info->initial_row_x; fila < info->final_row_x; ++fila)
     {
-        for(size_t columna = 0; columna < *(info->columnas); ++columna)
+        for(size_t columna = 0; columna < *(info->columnas)+1; ++columna)
         {
             if( columna == 0)
             {
@@ -65,55 +65,49 @@ void* calculate_levenshtein(void* data)
                 if( matrix_row == 0)
                 {
                     info->matrix_d[current][column] = column;
-                   // printf("r1 ");
+                    //printf("j ");
 
                 }
                 else if( column == 0)
                 {
                     info->matrix_d[current][column] = matrix_row;
-                    //printf("r2 ");
+                    //printf("i ");
                 }
-                else if( info->target[matrix_row - 1] == info->source[matrix_row - 1])
+                else if( info->target[column - 1] == info->source[matrix_row - 1])
                 {
-                    //printf("r3 ");
+                    //printf("== ");
                     info->matrix_d[current][column] = info->matrix_d[prev][column - 1];
                 }
-                else if( info->matrix_x[info->source[matrix_row - 1]][column] == 0)
+                else if( info->matrix_x[(int)info->source[matrix_row - 1]][column] == 0)
                 {
-                    //printf("r4 ");
+                    //printf("x ");
                     info->matrix_d[current][column] = 1 +
-                            MIN3(info->matrix_d[prev][column - 1],
-                            info->matrix_d[prev][column],
+                            MIN3(info->matrix_d[prev][column],
+                            info->matrix_d[prev][column-1],
                             matrix_row+column-1);
                 }
                 else
-                {
-
-                    if( column != info->initial_col_d)
+                {/*
+                    if( column == info->initial_col_d)
                     {
                         info->matrix_d[current][column] = MIN3(
                                     info->matrix_d[prev][column],
                                     info->matrix_d[current][column - 1],
                                     info->matrix_d[prev][column - 1]);
-                        ++(info->matrix_d[current][column]);
                         //printf("op ");
                     }
-                    else
+                    else*/
                     {
 
-                        info->matrix_d[current][column] =
-                                MIN3(
-                                    info->matrix_d[prev][column],
-                                    info->matrix_d[prev][column-1],
-                                    info->matrix_d[prev][info->matrix_x[info->source[matrix_row-1]][column] - 1]
-                                    + column - 1 - info->matrix_x[info->source[matrix_row-1]][column]);
-                        ++info->matrix_d[current][column];
-                        //printf("ow ");
+                        info->matrix_d[current][column] = 1 +
+                                MIN3( info->matrix_d[prev][column], info->matrix_d[prev][column-1], info->matrix_d[prev][info->matrix_x[(int)info->source[matrix_row-1]][column] -1 ] + column - 1 - info->matrix_x[(int)info->source[matrix_row-1]][column]);
+                        //printf("w ");
                     }
                 }
-                // printf("(%u)  ", info->matrix_d[current][column]);
+                //printf("(%zu)  ", info->matrix_d[current][column]);
             }
             pthread_barrier_wait(info->barrier);
+            //printf("\n");
         }
 
     return NULL;
@@ -165,7 +159,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
             return printf("oups"), 1;
     }
 
-    size_t actual_row = source_size;
+    size_t actual_row = len_pattern;
 
     pthread_t threads_levdist[number_threads];
     thread_info_levdist_t* info_levdist = calloc(number_threads, sizeof(thread_info_levdist_t));
@@ -191,7 +185,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
     for(size_t index = 0; index < number_threads; ++index)
         pthread_join(threads_levdist[index], NULL);
 
-    distance = matrix_lev[(actual_row-1) % 2][columns];
+    distance = matrix_lev[(actual_row - 1) % 2][columns-1];
 
 
 //    for(size_t index = 0; index < 256; ++index)
@@ -221,7 +215,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t nu
         free(matrix_lev[row_index]);
     free(matrix_lev);
 
-    return distance-1;
+    return distance;
 }
 
 size_t lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons, size_t number_threads)
