@@ -1,7 +1,7 @@
 CC=gcc
 CXX=g++
 FLAGS=-g -Wall -Wextra -pthread
-CFLAGS=$(FLAGS) -std=c11 
+CFLAGS=$(FLAGS) -std=c11 -std=gnu99
 CXXFLAGS=$(FLAGS) -std=c++11 
 LIBS=
 
