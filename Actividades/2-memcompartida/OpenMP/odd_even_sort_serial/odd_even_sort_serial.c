@@ -1,4 +1,3 @@
-#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -19,6 +18,7 @@ double randDouble(double lower, double upper)
     return randomValue;
 }
 
+https://www.programmingsimplified.com/c-program-swap-two-numbers
 void swap(double *a, double *b)
 {
    double t = *b;
@@ -64,5 +64,4 @@ int main(int argc, char* argv[])
 	printf("\n");
 	return 0;
 }
-
 
