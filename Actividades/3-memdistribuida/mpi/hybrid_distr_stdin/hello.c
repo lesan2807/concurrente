@@ -35,11 +35,6 @@ int main(int argc, char* argv[])
 	
 	char message[1024];
 
-
- 
-	size_t c = (b-a) / number_threads; 
-	size_t r = (b-a) % number_threads; 
-
 	int my_rank = -1; 
 	int process_count = -1;
 
@@ -61,7 +56,11 @@ int main(int argc, char* argv[])
 	else 
 	{
 		MPI_Recv(message, 1024, MPI_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		a = message[0];
+                b = message[1];
 	}	
+	size_t c = (b-a) / number_threads;
+        size_t r = (b-a) % number_threads;
 
 	size_t my_start = start(a, c, my_rank, r);
 	size_t my_finish = finish(a, c, my_rank, r);
