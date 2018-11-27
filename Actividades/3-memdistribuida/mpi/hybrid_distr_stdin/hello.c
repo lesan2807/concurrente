@@ -23,18 +23,7 @@ int main(int argc, char* argv[])
 	
 	size_t a = 0;
 	size_t b = 0; 
-	if( argc >= 2)
-	{
-		a = strtoull(argv[1], NULL, 10); 
-		b = strtoull(argv[2], NULL, 10);
-	}
-	else 
-	{
-		scanf("%zu %zu", &a, &b); 
-	}
-	
-	char message[1024];
-
+		
 	int my_rank = -1; 
 	int process_count = -1;
 
@@ -45,30 +34,38 @@ int main(int argc, char* argv[])
 	MPI_Comm_size(MPI_COMM_WORLD, &process_count);
 	MPI_Get_processor_name(hostname, &len_hostname); 
 	
-	if( my_rank == 0) 
+	if( argc >= 2)
 	{
+		a = strtoull(argv[1], NULL, 10); 
+		b = strtoull(argv[2], NULL, 10);
+	}
+	else if( my_rank == 0)
+	{
+		scanf("%zu %zu", &a, &b);
 		for( int recieve = 1; recieve < process_count; ++recieve)
 		{
-			sprintf(message, "%zu %zu", a, b);  
-			MPI_Send(message, 1024, MPI_CHAR, recieve, 0, MPI_COMM_WORLD);
-		}
+			MPI_Send(&a, 1, MPI_UNSIGNED_LONG_LONG, recieve, 0, MPI_COMM_WORLD);
+			MPI_Send(&b, 1, MPI_UNSIGNED_LONG_LONG, recieve, 0, MPI_COMM_WORLD);
+		} 
 	}
 	else 
 	{
-		MPI_Recv(message, 1024, MPI_CHAR, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		a = message[0];
-                b = message[1];
+		MPI_Recv(&a, 1, MPI_UNSIGNED_LONG_LONG, 0, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
+		MPI_Recv(&b, 1, MPI_UNSIGNED_LONG_LONG, 0, MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
 	}	
-	size_t c = (b-a) / number_threads;
-        size_t r = (b-a) % number_threads;
+	size_t c = (b-a) / process_count;
+	size_t r = (b-a) % process_count;
 
 	size_t my_start = start(a, c, my_rank, r);
 	size_t my_finish = finish(a, c, my_rank, r);
 	
+
 	printf("%s: range [%zu , %zu[ size %zu\n", hostname, my_start , my_finish, my_finish-my_start);
-	#pragma omp parallel for num_threads(number_threads) default(none) shared (a, c, r, hostname, number_threads)
+	#pragma omp parallel for num_threads(number_threads) default(none) shared (a, b, c, r, hostname, number_threads)
 	for (long long index = 0; index < number_threads; ++index)
 	{
+		c = (b-a) / number_threads;
+		r = (b-a) % number_threads;
 		size_t inicio = start(a, c, omp_get_thread_num(), r);
 		size_t final =  finish(a, c, omp_get_thread_num(), r);
 		printf("\t %s:%d: range [%zu , %zu[ size %zu\n", hostname, omp_get_thread_num(), inicio, final, final-inicio); 
