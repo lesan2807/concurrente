@@ -31,9 +31,10 @@ typedef struct{
 
   @param source Source string.
   @param target Target string.
+  @param workers Number of threads.
   @return Unsigned long long of the distance found between two strings.
 */
-size_t levenshtein_ascii(const char* source, const char* target);
+size_t levenshtein_ascii(unsigned char *source, unsigned char *target, size_t workers);
 
 
 /**
@@ -53,9 +54,10 @@ size_t levenshtein_unicode(const wchar_t* source, const wchar_t* target);
 
   @param distances Array of records that have the distance, the name of the source file and the name of the target file.
   @param comparisons Number of comparisons needed, also size of array.
+  @param workers Number of threads.
   @return Integer: for error handling.
  */
-int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons);
+int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons, size_t workers);
 
 
 /**

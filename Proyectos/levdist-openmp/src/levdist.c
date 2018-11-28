@@ -103,7 +103,7 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
     if( this->arguments.unicode )
         lev_dist_calculate_files_unicode(this->distances, comparisons);
     else
-        lev_dist_calculate_files_ascii(this->distances, comparisons);
+        lev_dist_calculate_files_ascii(this->distances, comparisons, this->arguments.workers);
 
     // Order array
     levdist_order_lev_dist_t(this->distances, comparisons);
