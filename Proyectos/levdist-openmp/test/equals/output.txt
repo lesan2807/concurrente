@@ -1,0 +1,3 @@
+0	equal1.txt	equal2.txt
+0	equal1.txt	equal3.txt
+0	equal2.txt	equal3.txt
