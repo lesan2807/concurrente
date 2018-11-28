@@ -6,7 +6,7 @@
 # Compiler options
 CC=gcc
 CXX=g++
-FLAGS=-Wall -Wextra
+FLAGS=-Wall -Wextra -fopenmp
 CFLAGS=$(FLAGS)
 CXXFLAGS=$(FLAGS)
 LIBS=
