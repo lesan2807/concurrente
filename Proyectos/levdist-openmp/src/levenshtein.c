@@ -49,6 +49,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
     size_t len_target = strlen((char*)target);
     size_t distance = 0;
     size_t columns = 1;
+    size_t rows_d = len_source;
     assert(source);
     assert(target);
     if( len_source > len_target )
@@ -60,10 +61,12 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
         len_source = len_target;
         len_target = temp_size;
         columns = len_source;
+        rows_d = len_target;
     }
     else
     {
         columns = len_target;
+        rows_d = len_source;
     }
     size_t rows = 256;
     size_t** matrix_x = (size_t**)calloc(rows , sizeof(size_t*));
@@ -72,10 +75,10 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
         matrix_x[row_index] = (size_t*)calloc((columns+1) , sizeof(size_t));
     }
 
-    size_t** matrix_lev = (size_t**)calloc( 2 , sizeof(size_t*));
+    size_t** matrix_d = (size_t**)calloc( 2 , sizeof(size_t*));
     for( size_t row_index = 0; row_index < 2; ++row_index )
     {
-        matrix_lev[row_index] = (size_t*)calloc((columns+1) , sizeof( size_t));
+        matrix_d[row_index] = (size_t*)calloc((columns+1) , sizeof( size_t));
     }
 
 #pragma omp parallel for num_threads(workers) default(none) shared(rows, matrix_x, target, source, columns)
@@ -95,6 +98,62 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
                 matrix_x[fila][columna] = matrix_x[fila][columna-1];
         }
     }
+
+    for(size_t matrix_row = 0; matrix_row < rows_d; ++matrix_row)
+    {
+        size_t current = matrix_row % 2;
+        size_t prev = (matrix_row + 1) % 2;
+#pragma omp parallel for num_threads(workers) default(none) shared(columns, matrix_d, source, target, current, prev, matrix_x, matrix_row)
+        for(size_t column = 0; column < columns; ++column)
+        {
+            if( matrix_row == 0)
+            {
+                matrix_d[current][column] = column;
+                //printf("j ");
+
+            }
+            else if( column == 0)
+            {
+                matrix_d[current][column] = matrix_row;
+                //printf("i ");
+            }
+            else if( target[column - 1] == source[matrix_row - 1])
+            {
+                //printf("== ");
+                matrix_d[current][column] = matrix_d[prev][column - 1];
+            }
+            else if( matrix_x[(int)source[matrix_row - 1]][column] == 0)
+            {
+                //printf("x ");
+                matrix_d[current][column] = 1 +
+                        MIN3(matrix_d[prev][column],
+                             matrix_d[prev][column-1],
+                        matrix_row+column-1);
+            }
+            else
+            {/*
+                        if( column != initial_col_d)
+                        {
+                            matrix_d[current][column] = MIN3(
+                                        matrix_d[prev][column],
+                                        matrix_d[current][column - 1],
+                                        matrix_d[prev][column - 1]);
+                            //printf("op ");
+                        }
+                        else*/
+                {
+
+                    matrix_d[current][column] = 1 +
+                            MIN3( matrix_d[prev][column], matrix_d[prev][column-1], matrix_d[prev][matrix_x[(int)source[matrix_row-1]][column] -1 ] + column - 1 - matrix_x[(int)source[matrix_row-1]][column]);
+                    //printf("w ");
+                }
+            }
+            //printf("(%zu)  ", matrix_d[current][column]);
+        }
+#pragma omp barrier
+        //printf("\n");
+    }
+    distance = matrix_d[(rows_d - 1) % 2][columns-1];
     return distance;
 }
 
