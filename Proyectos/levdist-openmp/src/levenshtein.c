@@ -55,6 +55,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
     if( len_source > len_target )
     {
         unsigned char* temp = source;
+        temp[len_source] = '\0';
         source = target;
         target = temp;
         size_t temp_size = len_source;
@@ -69,7 +70,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
         rows_d = len_source;
     }
     size_t rows = 256;
-    size_t** matrix_x = (size_t**)calloc(rows , sizeof(size_t*));
+    size_t** matrix_x = (size_t**)calloc(rows , sizeof(size_t*)+1);
     for ( size_t row_index = 0; row_index < rows; ++row_index )
     {
         matrix_x[row_index] = (size_t*)calloc((columns+1) , sizeof(size_t));
@@ -81,7 +82,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
         matrix_d[row_index] = (size_t*)calloc((columns+1) , sizeof( size_t));
     }
 
-#pragma omp parallel for num_threads(workers) default(none) shared(rows, matrix_x, target, source, columns)
+#pragma omp parallel for num_threads(workers) default(none) shared(rows, matrix_x, target, source, columns, stderr)
     for(size_t fila = 0; fila < rows; ++fila)
     {
         for(size_t columna = 0; columna < columns; ++columna)
@@ -103,10 +104,10 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
     {
         size_t current = matrix_row % 2;
         size_t prev = (matrix_row + 1) % 2;
-#pragma omp parallel for num_threads(workers) default(none) shared(columns, matrix_d, source, target, current, prev, matrix_x, matrix_row)
+        size_t initial_col_d = 0;
+#pragma omp parallel for num_threads(workers) default(none) shared(columns, matrix_d, source, target, current, prev, matrix_x, matrix_row, stderr) private(initial_col_d)
         for(size_t column = 0; column < columns; ++column)
         {
-            size_t initial_col_d = 0;
             if( matrix_row == 0)
             {
                 matrix_d[current][column] = column;
@@ -133,20 +134,20 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
             }
             else
             {
-                if(initial_col_d != 0)
-                {
-                    matrix_d[current][column] = MIN3(
-                                matrix_d[prev][column],
-                                matrix_d[current][column - 1],
-                            matrix_d[prev][column - 1]);
-                    //printf("op ");
-                }
-                else
+//                if(initial_col_d != 0)
+//                {
+//                    matrix_d[current][column] = MIN3(
+//                                matrix_d[prev][column],
+//                                matrix_d[current][column - 1],
+//                            matrix_d[prev][column - 1]);
+//                   // fprintf(stderr, "op ");
+//                }
+//                else
                 {
 
                     matrix_d[current][column] = 1 +
                             MIN3( matrix_d[prev][column], matrix_d[prev][column-1], matrix_d[prev][matrix_x[(int)source[matrix_row-1]][column] -1 ] + column - 1 - matrix_x[(int)source[matrix_row-1]][column]);
-                    //printf("w ");
+                    //fprintf(stderr, "ow ");
                 }
             }
             ++initial_col_d;
