@@ -9,16 +9,9 @@
 
 #include "levenshtein.h"
 
-
-// Choose the minimum of two numbers
-#define MIN(a,b) (((a)<=(b))?(a):(b))
 // Choose the minimum of three numbers
 #define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
 
-size_t start(size_t a, size_t c, size_t i, size_t r)
-{
-    return a + i*c + MIN(i,r);
-}
 //size_t levenshtein_ascii(const char* source, const char* target)
 //{
 //    size_t x, y, source_length, target_length;
@@ -88,10 +81,6 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
         matrix_d[row_index] = (size_t*)calloc((columns+1) , sizeof( size_t));
     }
 
-    size_t c = rows_d / omp_get_num_threads();
-    size_t r = rows_d % omp_get_num_threads();
-
-
 #pragma omp parallel for num_threads(workers) default(none) shared(rows, matrix_x, target, source, columns)
     for(size_t fila = 0; fila < rows; ++fila)
     {
@@ -114,11 +103,10 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
     {
         size_t current = matrix_row % 2;
         size_t prev = (matrix_row + 1) % 2;
-#pragma omp parallel for num_threads(workers) default(none) shared(columns, matrix_d, source, target, current, prev, matrix_x, matrix_row, c, r, stderr)
+#pragma omp parallel for num_threads(workers) default(none) shared(columns, matrix_d, source, target, current, prev, matrix_x, matrix_row)
         for(size_t column = 0; column < columns; ++column)
         {
-            size_t initial_col = start(column, c, omp_get_thread_num(), r);
-
+            size_t initial_col_d = 0;
             if( matrix_row == 0)
             {
                 matrix_d[current][column] = column;
@@ -145,15 +133,15 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
             }
             else
             {
-//                if( column != initial_col)
-//                {
-//                    matrix_d[current][column] = MIN3(
-//                                matrix_d[prev][column],
-//                                matrix_d[current][column - 1],
-//                            matrix_d[prev][column - 1]);
-//                    fprintf(stderr, "op\n");
-//                }
-//                else
+                if(initial_col_d != 0)
+                {
+                    matrix_d[current][column] = MIN3(
+                                matrix_d[prev][column],
+                                matrix_d[current][column - 1],
+                            matrix_d[prev][column - 1]);
+                    //printf("op ");
+                }
+                else
                 {
 
                     matrix_d[current][column] = 1 +
@@ -161,6 +149,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
                     //printf("w ");
                 }
             }
+            ++initial_col_d;
             //printf("(%zu)  ", matrix_d[current][column]);
         }
 #pragma omp barrier
