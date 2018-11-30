@@ -43,34 +43,12 @@
 
 #define MIN3(a, b, c) ((a) < (b) ? ((a) < (c) ? (a) : (c)) : ((b) < (c) ? (b) : (c)))
 
-size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t workers)
+size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t source_len, size_t target_len, size_t workers)
 {
-    size_t len_source = strlen((char*)source);
-    size_t len_target = strlen((char*)target);
     size_t distance = 0;
-    size_t columns = 1;
-    size_t rows_d = len_source;
-    assert(source);
-    assert(target);
-    if( len_source > len_target )
-    {
-        unsigned char* temp = source;
-        temp[len_source] = '\0';
-        source = target;
-        target = temp;
-        size_t temp_size = len_source;
-        len_source = len_target;
-        len_target = temp_size;
-        columns = len_source;
-        rows_d = len_target;
-    }
-    else
-    {
-        columns = len_target;
-        rows_d = len_source;
-    }
+    size_t columns = target_len + 1;
     size_t rows = 256;
-    size_t** matrix_x = (size_t**)calloc(rows , sizeof(size_t*)+1);
+    size_t** matrix_x = (size_t**)calloc(rows , sizeof(size_t*));
     for ( size_t row_index = 0; row_index < rows; ++row_index )
     {
         matrix_x[row_index] = (size_t*)calloc((columns+1) , sizeof(size_t));
@@ -100,13 +78,13 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
         }
     }
 
-    for(size_t matrix_row = 0; matrix_row < rows_d; ++matrix_row)
+    for(size_t matrix_row = 0; matrix_row < source_len + 1; ++matrix_row)
     {
         size_t current = matrix_row % 2;
         size_t prev = (matrix_row + 1) % 2;
         size_t initial_col_d = 0;
-#pragma omp parallel for num_threads(workers) default(none) shared(columns, matrix_d, source, target, current, prev, matrix_x, matrix_row, stderr) private(initial_col_d)
-        for(size_t column = 0; column < columns; ++column)
+#pragma omp parallel for num_threads(workers) default(none) shared(source_len, target_len,  matrix_d, source, target, current, prev, matrix_x, matrix_row, stderr) private(initial_col_d)
+        for(size_t column = 0; column < target_len + 1; ++column)
         {
             if( matrix_row == 0)
             {
@@ -156,7 +134,7 @@ size_t levenshtein_ascii(unsigned char* source, unsigned char* target, size_t wo
 #pragma omp barrier
         //printf("\n");
     }
-    distance = matrix_d[(rows_d - 1) % 2][columns-1];
+    distance = matrix_d[(source_len - 1) % 2][target_len-1];
     return distance;
 }
 
@@ -244,7 +222,12 @@ int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t compariso
 
         distances[index].distance = 0;
         if( (size_t)file_info_source.st_size != 0 && (size_t)file_info_target.st_size != 0)
-            distances[index].distance = levenshtein_ascii(source, target, workers);
+        {
+            if( strlen((char*)source) > strlen((char*)target) )
+                distances[index].distance = levenshtein_ascii(source, target, strlen((char*)source), strlen((char*)target), workers);
+            else
+                distances[index].distance = levenshtein_ascii( target, source, strlen((char*)target), strlen((char*)source), workers);
+        }
         free(source);
         free(target);
         fclose(source_file);

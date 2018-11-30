@@ -31,10 +31,12 @@ typedef struct{
 
   @param source Source string.
   @param target Target string.
+  @param source_len Source string lenght.
+  @param target_len Target string lenght.
   @param workers Number of threads.
   @return Unsigned long long of the distance found between two strings.
 */
-size_t levenshtein_ascii(unsigned char *source, unsigned char *target, size_t workers);
+size_t levenshtein_ascii(unsigned char *source, unsigned char *target, size_t source_len, size_t target_len, size_t workers);
 
 
 /**
