@@ -1,0 +1,2 @@
+###Eficiencia:
+Es hacer una tarea economizando los recursos que tiene la máquina disponibles. Entre más eficiente sea un algoritmo o un programa menos recursos consume. Esto se mide con respecto al tiempo que toma y a la cantidad de memoria (el espacio) que usa.
