@@ -8,10 +8,10 @@
 array_t array_create(size_t capacity)
 {
 	assert(capacity);
-	array_t temp = (array_t)malloc(sizeof(array_t)); 
+	array_t temp = malloc(sizeof(array_struct)); 
 	temp->array_capacity = capacity;
 	temp->array_count = 0;
-	temp->array_elements = (void**)malloc( capacity * sizeof(void*) );
+	temp->array_elements = malloc( capacity * sizeof(void*) );
 	pthread_mutex_init(&temp->lock, NULL);
 	return temp; 
 }
@@ -26,7 +26,7 @@ void array_destroy(array_t array)
 int array_increase_capacity(array_t array)
 {
 	size_t new_capacity = 10 * array->array_capacity;
-	void** new_elements = (void**)realloc( &array->array_elements, new_capacity * sizeof(void*) );
+	void** new_elements = (void**)realloc( array->array_elements, new_capacity * sizeof(void*) );
 	if ( new_elements == NULL )
 		return -1;
 	
@@ -41,7 +41,7 @@ int array_decrease_capacity(array_t array)
 	size_t new_capacity = array->array_capacity / 10;
 	if ( new_capacity < 10 )
 		return 0;
-	void** new_elements = (void**)realloc( &array->array_elements, new_capacity * sizeof(void*) );
+	void** new_elements = (void**)realloc( array->array_elements, new_capacity * sizeof(void*) );
 	if ( new_elements == NULL )
 		return -1;
 	
