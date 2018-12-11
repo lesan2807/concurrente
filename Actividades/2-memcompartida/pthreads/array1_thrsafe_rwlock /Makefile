@@ -1,8 +1,8 @@
 CC=gcc
 CXX=g++
 FLAGS=-g -Wall -Wextra -pthread
-CFLAGS=$(FLAGS) -std=c11 -std=gnu99
-CXXFLAGS=$(FLAGS) -std=c++11 
+CFLAGS=$(FLAGS) 
+CXXFLAGS=$(FLAGS) 
 LIBS=
 
 HEADERS=$(wildcard *.h)
