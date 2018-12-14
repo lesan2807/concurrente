@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 	}
 	
 			
-	while( potato > 1 && total > 1)
+	while( my_potato > 1 && total > 1)
 	{
 		MPI_Recv(&my_potato, 1, MPI_LONG_LONG_INT, prev, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
 		MPI_Recv(&total, 1, MPI_INT, prev, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
@@ -51,7 +51,6 @@ int main(int argc, char** argv)
 			else 
 				my_potato = 3*my_potato + 1; 
 		}
-		printf("papa %lld on process %d\n", my_potato, my_rank);
 		if( my_potato == 1)
 		{
 			--total;
