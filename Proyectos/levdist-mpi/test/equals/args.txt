@@ -1,0 +1,1 @@
+-q equal1.txt equal2.txt equal3.txt

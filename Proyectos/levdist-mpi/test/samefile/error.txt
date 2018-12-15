@@ -1,0 +1,1 @@
+levdist: error: at least two files are required to compare

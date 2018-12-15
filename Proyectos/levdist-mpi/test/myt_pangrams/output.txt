@@ -1,0 +1,15 @@
+1	pangrams/missing_letters/missing1.txt	pangrams/perfect/fox.txt
+32	pangrams/missing_letters/missing1.txt	pangrams/perfect/perfect_short/jim.txt
+32	pangrams/perfect/fox.txt	pangrams/perfect/perfect_short/jim.txt
+47	pangrams/missing_letters/missing1.txt	pangrams/perfect/wage.txt
+48	pangrams/perfect/fox.txt	pangrams/perfect/wage.txt
+52	pangrams/perfect/perfect_short/jim.txt	pangrams/perfect/wage.txt
+67	pangrams/missing_letters/not_complete.txt	pangrams/perfect/wage.txt
+71	pangrams/missing_letters/missing1.txt	pangrams/missing_letters/not_complete.txt
+72	pangrams/missing_letters/not_complete.txt	pangrams/perfect/fox.txt
+74	pangrams/missing_letters/not_complete.txt	pangrams/perfect/perfect_short/jim.txt
+92	pangrams/missing_letters/not_complete.txt	pangrams/perfect/friars.txt
+98	pangrams/perfect/friars.txt	pangrams/perfect/wage.txt
+102	pangrams/perfect/fox.txt	pangrams/perfect/friars.txt
+103	pangrams/missing_letters/missing1.txt	pangrams/perfect/friars.txt
+107	pangrams/perfect/friars.txt	pangrams/perfect/perfect_short/jim.txt

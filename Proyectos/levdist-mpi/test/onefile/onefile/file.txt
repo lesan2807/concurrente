@@ -1,0 +1,2 @@
+Directories must contain at least two files.
+Otherwise no comparisons are possible.
