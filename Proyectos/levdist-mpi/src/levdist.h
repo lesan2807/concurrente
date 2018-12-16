@@ -36,6 +36,10 @@ typedef struct
 	queue_t* files;
 	/// Array of comparisons found using Levenshtein distance.
     lev_dist_files_t* distances;
+    /// Rank number
+    int my_rank;
+    /// Number of process
+    int process_count;
 } levdist_t;
 
 

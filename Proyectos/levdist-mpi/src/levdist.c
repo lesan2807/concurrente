@@ -47,8 +47,11 @@ void levdist_init(levdist_t* this)
 
 int levdist_run(levdist_t* this, int argc, char* argv[])
 {
-    MPI_Init();
-	// Analyze the arguments given by the user
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &this->process_count);
+    MPI_Comm_rank(MPI_COMM_WORLD, &this->my_rank);
+
+    // Analyze the arguments given by the user
 	this->arguments = arguments_analyze(argc, argv);
 
 	// If arguments are incorrect, stop
@@ -76,14 +79,10 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
     {
         setlocale(LC_ALL, "");
     }
-	// Start counting the time
-	walltime_t start_total;
-	walltime_t start_comparisons;
-	walltime_start(&start_total);
 
-	// Load all files into a list
-	this->files = queue_create();
-	levdist_list_files_in_args(this, argc, argv);
+    // Load all files into a list
+    this->files = queue_create();
+    levdist_list_files_in_args(this, argc, argv);
 
     // How many comparisons need to be done. (Gauss formula)
     size_t comparisons = queue_count(this->files)*(queue_count(this->files)-1)/2;
@@ -99,8 +98,6 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
 
     // Fill the array of records for each file
     distances_init(this);
-
-	walltime_start(&start_comparisons);
     // Calculate levenshtein distance for all files.
     if( this->arguments.unicode )
         lev_dist_calculate_files_unicode(this->distances, comparisons);
@@ -125,9 +122,9 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
     //array_destroy
     free(this->distances);
 
-	// Report elapsed time when -q is not written on arguments.
-	if( !this->arguments.quiet )
-        printf("Total time %.9lfs, comparing time %.9lfs, with %d workers\n", walltime_elapsed(&start_total), walltime_elapsed(&start_comparisons), this->arguments.workers);
+    // Report elapsed time when -q is not written on arguments.
+    if( !this->arguments.quiet )
+       // printf("Total time %.9lfs, comparing time %.9lfs, with %d workers\n", walltime_elapsed(&start_total), walltime_elapsed(&start_comparisons), this->arguments.workers);
 
     queue_destroy(this->files, true);
 

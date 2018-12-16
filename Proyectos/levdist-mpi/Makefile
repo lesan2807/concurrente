@@ -4,8 +4,8 @@
 # Variables =====================================
 
 # Compiler options
-CC=gcc
-CXX=g++
+CC=mpicc
+CXX=mpic++
 FLAGS=-Wall -Wextra -fopenmp
 CFLAGS=$(FLAGS)
 CXXFLAGS=$(FLAGS)
