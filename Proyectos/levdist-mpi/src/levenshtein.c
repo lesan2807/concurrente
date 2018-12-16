@@ -189,9 +189,10 @@ size_t levenshtein_unicode(const wchar_t* source, const wchar_t* target)
 }
 
 
-int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons, size_t workers)
+int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons, size_t* dist_array, size_t workers, size_t start, size_t final)
 {
-    for(size_t index = 0; index < comparisons; ++index)
+    (void)comparisons;
+    for(size_t index = start; index < final; ++index)
     {
         FILE* source_file;
         FILE* target_file;
@@ -220,13 +221,13 @@ int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t compariso
         source[file_info_source.st_size] = '\0';
         target[file_info_target.st_size] = '\0';
 
-        distances[index].distance = 0;
+        dist_array[index] = 0;
         if( (size_t)file_info_source.st_size != 0 && (size_t)file_info_target.st_size != 0)
         {
             if( strlen((char*)source) > strlen((char*)target) )
-                distances[index].distance = levenshtein_ascii(source, target, strlen((char*)source), strlen((char*)target), workers);
+                dist_array[index] = levenshtein_ascii(source, target, strlen((char*)source), strlen((char*)target), workers);
             else
-                distances[index].distance = levenshtein_ascii( target, source, strlen((char*)target), strlen((char*)source), workers);
+                dist_array[index] = levenshtein_ascii( target, source, strlen((char*)target), strlen((char*)source), workers);
         }
         free(source);
         free(target);

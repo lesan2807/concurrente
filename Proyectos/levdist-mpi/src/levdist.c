@@ -10,6 +10,8 @@
 #include "levdist.h"
 #include "levenshtein.h"
 
+#define MIN(a,b) (((a)<=(b))?(a):(b))
+
 // Private functions:
 
 /// Shows how to travese the list removing elements
@@ -50,6 +52,7 @@ int levdist_run(levdist_t* this, int argc, char* argv[])
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &this->process_count);
     MPI_Comm_rank(MPI_COMM_WORLD, &this->my_rank);
+    MPI_Barrier(MPI_COMM_WORLD);
 
     // Analyze the arguments given by the user
 	this->arguments = arguments_analyze(argc, argv);
@@ -90,43 +93,87 @@ int levdist_process_dirs(levdist_t* this, int argc, char* argv[])
     // If only one file or the same file:
     if( comparisons == 0 || levdist_check_different_files(this->files))
     {
-        queue_destroy(this->files, true);
-        return fprintf(stderr, "levdist: error: at least two files are required to compare\n"), 2;
+        //queue_destroy(this->files, true);
+        if(this->my_rank == 0)
+            return fprintf(stderr,"levdist: error: at least two files are required to compare\n"), 2;
     }
     // Create the array
     this->distances = malloc(comparisons*sizeof(lev_dist_files_t));
+    size_t* dist_array = calloc(comparisons, sizeof(size_t));
+    size_t c = comparisons / this->process_count;
+    size_t r = comparisons % this->process_count;
+    size_t start = this->my_rank * c + MIN((long long)this->my_rank, (long long)r);
+    size_t final = (this->my_rank+1) * c + MIN((long long)(this->my_rank+1), (long long)r);
 
     // Fill the array of records for each file
     distances_init(this);
     // Calculate levenshtein distance for all files.
+
+    // We know all processes are ready to do the heavy task
+    double begin = MPI_Wtime();
     if( this->arguments.unicode )
-        lev_dist_calculate_files_unicode(this->distances, comparisons);
-    else
-        lev_dist_calculate_files_ascii(this->distances, comparisons, this->arguments.workers);
-
-    // Order array
-    levdist_order_lev_dist_t(this->distances, comparisons);
-    qsort(this->distances, comparisons, sizeof(lev_dist_files_t), less_than_files_target);
-    qsort(this->distances, comparisons, sizeof(lev_dist_files_t), less_than_files_source);
-    qsort(this->distances, comparisons, sizeof(lev_dist_files_t), less_than_distance);
-
-
-    // Print filenames found when -Q is provided as an argument.
-    if( !this->arguments.silent)
     {
-        // fprintf(stderr, "comparisons: %zu\n", comparisons);
-        // levdist_print_files(this);
-        levdist_print_distances(this, comparisons);
+        if(this->my_rank == 0)
+            printf("Unicode is still in process\n");
+    }
+    else
+        lev_dist_calculate_files_ascii(this->distances, comparisons, dist_array, this->arguments.workers, start, final);
+
+    double finish = MPI_Wtime();
+    double duration = finish - begin;
+    double max_duration = -1.0;
+    MPI_Reduce(&duration, &max_duration, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+
+    if(this->my_rank !=0)
+    {
+        MPI_Send(dist_array, comparisons, MPI_UNSIGNED_LONG_LONG, 0, 0, MPI_COMM_WORLD);
+        MPI_Send(&start, 1, MPI_UNSIGNED_LONG_LONG, 0, 1, MPI_COMM_WORLD);
+        MPI_Send(&final, 1, MPI_UNSIGNED_LONG_LONG, 0, 2, MPI_COMM_WORLD);
     }
 
-    //array_destroy
-    free(this->distances);
+    if(this->my_rank == 0)
+    {
+        for(size_t index = start; index < final; ++index)
+            this->distances[index].distance = dist_array[index];
+        for(int recieve = 1; recieve < this->process_count; ++recieve)
+        {
+            MPI_Recv(dist_array, comparisons, MPI_UNSIGNED_LONG_LONG, recieve, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(&start, 1, MPI_UNSIGNED_LONG_LONG, recieve, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(&final, 1, MPI_UNSIGNED_LONG_LONG, recieve, 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            for(size_t index = start; index < final; ++index)
+                this->distances[index].distance = dist_array[index];
+
+        }
+        levdist_order_lev_dist_t(this->distances, comparisons);
+        qsort(this->distances, comparisons, sizeof(lev_dist_files_t), less_than_files_target);
+        qsort(this->distances, comparisons, sizeof(lev_dist_files_t), less_than_files_source);
+        qsort(this->distances, comparisons, sizeof(lev_dist_files_t), less_than_distance);
+
+
+        // Print filenames found when -Q is provided as an argument.
+        if( !this->arguments.silent)
+        {
+            // fprintf(stderr, "comparisons: %zu\n", comparisons);
+            // levdist_print_files(this);
+            if(comparisons != 0 || levdist_check_different_files(this->files) == 1)
+                levdist_print_distances(this, comparisons);
+        }
+
+        // Report elapsed time when -q is not written on arguments.
+        if( !this->arguments.quiet )
+            printf("Duration %.9lf seconds\n", max_duration);
+    }
 
     // Report elapsed time when -q is not written on arguments.
     if( !this->arguments.quiet )
        // printf("Total time %.9lfs, comparing time %.9lfs, with %d workers\n", walltime_elapsed(&start_total), walltime_elapsed(&start_comparisons), this->arguments.workers);
 
     queue_destroy(this->files, true);
+    //array_destroy
+    free(this->distances);
+    // array_destroy
+    free(dist_array);
 
     MPI_Finalize();
 	return 0;

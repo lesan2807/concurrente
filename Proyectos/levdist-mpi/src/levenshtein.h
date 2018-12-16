@@ -57,9 +57,13 @@ size_t levenshtein_unicode(const wchar_t* source, const wchar_t* target);
   @param distances Array of records that have the distance, the name of the source file and the name of the target file.
   @param comparisons Number of comparisons needed, also size of array.
   @param workers Number of threads.
+  @param dist_array Where all the distances are stored.
+  @param start Where calculations begin.
+  @param final Where calculations end.
+
   @return Integer: for error handling.
  */
-int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons, size_t workers);
+int lev_dist_calculate_files_ascii(lev_dist_files_t* distances, size_t comparisons, size_t *dist_array, size_t workers, size_t start, size_t final);
 
 
 /**
