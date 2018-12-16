@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <ctype.h>
 
-char* read_message(); 
+void read_message(char* message); 
 void modify_message(double vocal_prob, double consonant_prob, char* message);
 
 int main(int argc, char** argv)
@@ -19,42 +19,57 @@ int main(int argc, char** argv)
 	double vocal_prob = atof(argv[1]); 
 	double consonant_prob = atof(argv[2]); 
 	int rounds = 1; 
-	char* message = NULL; 
+	char* message = malloc(100000*sizeof(char)); 
 	if (argc > 2)
-		rounds = atoi(argv[3]); 
+		rounds = atoi(argv[3]);
 
 	if(my_rank == 0)
 	{
-		message = read_message(); 
+		printf("%s\n", "reading ");
+		read_message(message);
+		printf("%s\n", "message read");
 		for(int send = 1; send < process_count; ++send)
 		{
 			MPI_Send(message, strlen(message), MPI_CHAR, send, 0, MPI_COMM_WORLD); 
 		}
+		printf("%s\n", "sendinggggggggg message");
 	}
 	else
 	{
 		MPI_Recv(message, strlen(message), MPI_CHAR, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
+		printf("%s\n", "recieved");
 	}
+
+
 
 	int next = (my_rank + 1) % process_count; 
 	int prev = (my_rank - 1 + process_count) % process_count; 	
 	int round_so_far = 0; 
 	if(my_rank == 0)
 	{
-		MPI_Send(&round_so_far, 1, MPI_INT, 1, 0, MPI_COMM_WORLD); 
 		modify_message(vocal_prob, consonant_prob, message); 
 		MPI_Send(message, strlen(message), MPI_CHAR, 1, 0, MPI_COMM_WORLD); 
+		MPI_Send(&round_so_far, 1, MPI_INT, 1, 0, MPI_COMM_WORLD); 
+		printf("%s\n", "sendinggg to 1 ");
 	}
 
 	while( round_so_far < rounds)
 	{
 		MPI_Recv(message, strlen(message), MPI_CHAR, prev, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
 		MPI_Recv(&round_so_far, 1,MPI_INT, prev, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		if(my_rank == process_count -1)
+		printf("%s\n", "recieved");
+		if(my_rank == process_count-1 )
 			++round_so_far; 
 		modify_message(vocal_prob, consonant_prob, message); 
 		MPI_Send(message, strlen(message),MPI_CHAR, next, 0, MPI_COMM_WORLD); 
 		MPI_Send(&round_so_far, 1, MPI_INT, next, 0, MPI_COMM_WORLD); 
+		printf("%s\n", "sendinggg to next");
+	}
+
+	if(my_rank == 0)
+	{
+		for(size_t index = 0; index < strlen(message); ++index)
+			putchar(message[index]);
 	}
 
 	free(message); 
@@ -64,18 +79,16 @@ int main(int argc, char** argv)
 	return 0;
 }
 
-char* read_message()
+void read_message(char* message)
 {
-	char* message_to_read = (char*)calloc(10000, sizeof(char)); 
-	int c = -1; 
+	int c;
 	int index = 0; 
-	while(c != EOF)
+	do
 	{
 		c = fgetc(stdin); 
-		message_to_read[index] = c; 
+		message[index] = c; 
 		++index; 
-	}
-	return message_to_read; 
+	}while(c != EOF);
 }
 
 void modify_message(double vocal_prob, double consonant_prob, char* message)
